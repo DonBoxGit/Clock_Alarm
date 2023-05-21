@@ -4,7 +4,7 @@
 #include <GyverTM1637.h>
 #include "alarmTime.h"
 
-GyverTM1637 disp(TM1637_CLK_PIN, TM1637_DIO_PIN);
+GyverTM1637 displayTM1637(TM1637_CLK_PIN, TM1637_DIO_PIN);
 uint32_t Now, clocktimer;
 boolean flag;
 static uint8_t timeDisp[4];
@@ -14,37 +14,37 @@ void displayTime(void) {
   timeDisp[1] = pDS3231->getHours() % 10;
   timeDisp[2] = pDS3231->getMinutes() / 10;
   timeDisp[3] = pDS3231->getMinutes() % 10;
-  disp.display(timeDisp);
+  displayTM1637.display(timeDisp);
 }
 
 void twists() {
   // скручивание массив ЦИФР
   byte digs[4] = {3, 5, 7, 1};
-  disp.twist(digs, 50);     // скорость прокрутки 100
+  displayTM1637.twist(digs, 50);     // скорость прокрутки 100
   delay(1000);
 
   // скручивание прицельно (ячейка, БАЙТ, скорость)
-  disp.twistByte(0, _1, 50);
+  displayTM1637.twistByte(0, _1, 50);
   delay(1000);
 
   // скручивание прицельно (ячейка, ЦИФРА, скорость)
-  disp.twist(0, 8, 70);
+  displayTM1637.twist(0, 8, 70);
   delay(1000);
 
-  disp.clear();
+  displayTM1637.clear();
   delay(200);
   for (byte i = 0; i < 10; i++) {
-    disp.twist(3, i, 20);
+    displayTM1637.twist(3, i, 20);
     delay(200);
   }
 
   // скручивание массива БАЙТ
   byte troll[4] = {_t, _r, _o, _l};
-  disp.twistByte(troll, 50);
+  displayTM1637.twistByte(troll, 50);
   delay(1000);
 
   // прицельное скручивание БАЙТА (ячейка, байт, скорость)
-  disp.twistByte(2, _G, 50);
+  displayTM1637.twistByte(2, _G, 50);
   delay(1000);
 }
 
@@ -56,7 +56,7 @@ void twistClock() {
     if (millis() - tmr > 500) {       // каждые полсекунды
       tmr = millis();
       flag = !flag;
-      disp.point(flag);   // выкл/выкл точки
+      displayTM1637.point(flag);   // выкл/выкл точки
 
       if (flag) {
         // ***** часы! ****
@@ -67,80 +67,80 @@ void twistClock() {
           if (hrs > 24) hrs = 0;
         }
         // ***** часы! ****
-        disp.displayClockTwist(hrs, mins, 35);    // выводим время
+        displayTM1637.displayClockTwist(hrs, mins, 35);    // выводим время
       }
     }
   }
-  disp.point(0);   // выкл точки
+  displayTM1637.point(0);   // выкл точки
 }
 
 void scrolls() {
   // прокрутка массив ЦИФР
   byte digs[4] = {3, 5, 7, 1};
-  disp.scroll(digs, 100);     // скорость прокрутки 100
+  displayTM1637.scroll(digs, 100);     // скорость прокрутки 100
   delay(1000);
 
   // прокрутка прицельно (ячейка, ЦИФРА, скорость)
-  disp.scroll(0, 8, 200);
+  displayTM1637.scroll(0, 8, 200);
   delay(1000);
 
-  disp.clear();
+  displayTM1637.clear();
   delay(1000);
   for (byte i = 0; i < 10; i++) {
-    disp.scroll(3, i, 50);
+    displayTM1637.scroll(3, i, 50);
     delay(400);
   }
 
   // прокрутка массива БАЙТ
   byte troll[4] = {_t, _r, _o, _l};
-  disp.scrollByte(troll, 100);
+  displayTM1637.scrollByte(troll, 100);
   delay(1000);
 
   // прицельная прокрутка БАЙТА (ячейка, байт, скорость)
-  disp.scrollByte(2, _G, 50);
+  displayTM1637.scrollByte(2, _G, 50);
   delay(1000);
 }
 
 void bytes() {
   // выводим байты из массива
   byte troll[4] = {_t, _r, _o, _l};
-  disp.displayByte(troll);
+  displayTM1637.displayByte(troll);
   delay(1000);
 
   // выводим байты напрямую (4 в скобках)
-  disp.displayByte(_L, _O, _L, _empty);
+  displayTM1637.displayByte(_L, _O, _L, _empty);
   delay(1000);
 
   // выводим байты "прицельно"
-  disp.displayByte(3, _O);    // 3 ячейка, буква О
+  displayTM1637.displayByte(3, _O);    // 3 ячейка, буква О
   delay(1000);
 
   // выводим цифры из массива
   byte hell[4] = {6, 6, 6, 6};
-  disp.display(hell);
+  displayTM1637.display(hell);
   delay(1000);
 
   // выводим цифры напрямую (4 в скобках)
-  disp.display(1, 2, 3, 4);
+  displayTM1637.display(1, 2, 3, 4);
   delay(1000);
 
   // выводим цифры "прицельно"
-  disp.display(0, 9);    // 0 ячейка, цифра 9
+  displayTM1637.display(0, 9);    // 0 ячейка, цифра 9
   delay(1000);
 }
 
 void fadeBlink() {
   // пишем HELL
-  disp.displayByte(_H, _E, _L, _L);
+  displayTM1637.displayByte(_H, _E, _L, _L);
 
   Now = millis();
   while (millis () - Now < 3000) {    // 3 секунды
     for (int i = 7; i > 0; i--) {
-      disp.brightness(i);   // меняем яркость
+      displayTM1637.brightness(i);   // меняем яркость
       delay(40);
     }
     for (int i = 0; i < 8; i++) {
-      disp.brightness(i);   // меняем яркость
+      displayTM1637.brightness(i);   // меняем яркость
       delay(40);
     }
   }
@@ -154,7 +154,7 @@ void scrollClock() {
     if (millis() - tmr > 500) {       // каждые полсекунды
       tmr = millis();
       flag = !flag;
-      disp.point(flag);   // выкл/выкл точки
+      displayTM1637.point(flag);   // выкл/выкл точки
 
       if (flag) {
         // ***** часы! ****
@@ -165,11 +165,11 @@ void scrollClock() {
           if (hrs > 24) hrs = 0;
         }
         // ***** часы! ****
-        disp.displayClockScroll(hrs, mins, 70);    // выводим время
+        displayTM1637.displayClockScroll(hrs, mins, 70);    // выводим время
       }
     }
   }
-  disp.point(0);   // выкл точки
+  displayTM1637.point(0);   // выкл точки
 }
 
 void normClock() {
@@ -180,7 +180,7 @@ void normClock() {
     if (millis() - tmr > 500) {       // каждые полсекунды
       tmr = millis();
       flag = !flag;
-      disp.point(flag);   // выкл/выкл точки
+      displayTM1637.point(flag);   // выкл/выкл точки
 
       // ***** часы! ****
       mins ++;
@@ -190,29 +190,29 @@ void normClock() {
         if (hrs > 24) hrs = 0;
       }
       // ***** часы! ****
-      disp.displayClock(hrs, mins);   // выводим время функцией часов
+      displayTM1637.displayClock(hrs, mins);   // выводим время функцией часов
     }
   }
-  disp.point(0);   // выкл точки
+  displayTM1637.point(0);   // выкл точки
 }
 
 void ints() {
   // тупо отправляем цифры
-  disp.displayInt(-999);
+  displayTM1637.displayInt(-999);
   delay(500);
-  disp.displayInt(-99);
+  displayTM1637.displayInt(-99);
   delay(500);
-  disp.displayInt(-9);
+  displayTM1637.displayInt(-9);
   delay(500);
-  disp.displayInt(0);
+  displayTM1637.displayInt(0);
   delay(500);
-  disp.displayInt(6);
+  displayTM1637.displayInt(6);
   delay(500);
-  disp.displayInt(66);
+  displayTM1637.displayInt(66);
   delay(500);
-  disp.displayInt(666);
+  displayTM1637.displayInt(666);
   delay(500);
-  disp.displayInt(6666);
+  displayTM1637.displayInt(6666);
   delay(500);
 }
 
@@ -221,7 +221,7 @@ void runningText() {
                            _e, _n, _j, _o, _y, _empty, _empty,
                            _1, _6, _3, _7, _empty, _d, _i, _S, _P, _l, _a, _y
                           };
-  disp.runningString(welcome_banner, sizeof(welcome_banner), 200);  // 200 это время в миллисекундах!
+  displayTM1637.runningString(welcome_banner, sizeof(welcome_banner), 200);  // 200 это время в миллисекундах!
 }
 
 #endif /* _LED_DISPLAY_ */
