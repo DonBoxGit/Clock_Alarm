@@ -24,8 +24,8 @@ void ISR_RTC_INT() { Serial.println("RTC Alarm trigered!"); }
 void setup() {
   Serial.begin(9600);
 
-  disp.clear();
-  disp.brightness(MIN_BRIGHTNESS);
+  displayTM1637.clear();
+  displayTM1637.brightness(MIN_BRIGHTNESS);
 
   uint8_t value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   Serial.println(value);
@@ -61,5 +61,5 @@ void setup() {
 void loop() {
    if (checkTime.ready()) displayTime();
 
-   disp.point(blinkPointsTimer.getStatus());
+   displayTM1637.point(blinkPointsTimer.getStatus());
 }
