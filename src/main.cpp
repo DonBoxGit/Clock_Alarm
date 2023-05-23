@@ -3,8 +3,8 @@
  *                         ver. 1.0.0                         *
  *     Used RTC DS3231 on I2C wire, 4-Digit LED Display,      *
  *  WS2812B LED Ring 16 leds and DFPlayer Mini.               *
- *                                                            
- *                                   Autor: Roman Ykubovskiy  *
+ *                                                            *
+ *                                  Autor: Roman Yakubovskiy  *
  **************************************************************/
 
 #include <Arduino.h>
