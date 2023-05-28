@@ -15,12 +15,13 @@
 #include <SoftwareSerial.h>
 #include "ledDisplay.h"
 #include "alarmTime.h"
-#include "timer_blink.h"
+//#include "timer_blink.h"
+#include "sensorButton.h"
 
 Blink blinkPointsTimer(500);
 Timer checkTime(1000);
 RTCAlarmTime alarm1;
-static int8_t ledBrightnessCounter = 0;
+//static int8_t ledBrightnessCounter = 0;
 
 enum class Mode : uint8_t {
   WORK = 0,
@@ -33,11 +34,13 @@ enum class Menu : uint8_t {
 
 };
 
+/* RTC Alarm interrupt function */
 void ISR_RTC_INT() { Serial.println("RTC Alarm trigered!"); }
 /* Initialization of buttons for control */
 EncButton<EB_TICK, LEFT_BUTTON_PIN>  left_btn  (INPUT_PULLUP);
 EncButton<EB_TICK, RIGHT_BUTTON_PIN> right_btn (INPUT_PULLUP);
-//EncButton<EB_TICK, SENSOR_MODULE_PIN>sensor_mod(INPUT_PULLUP);
+//EncButton<EB_TICK, SENSOR_MODULE_PIN>sensor_btn(INPUT_PULLUP);
+SensorButton sensor_btn(SENSOR_MODULE_PIN);
 
 void setup() {
   Serial.begin(9600);
@@ -67,8 +70,6 @@ void setup() {
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
   attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
 
-  pinMode(SENSOR_MODULE_PIN, INPUT);
-
   if (!pDS3231->begin())
     Serial.println("--DS3231 not found--");
 
@@ -80,7 +81,28 @@ void setup() {
 }
 
 void loop() {
-   if (checkTime.ready()) displayTime();
+  left_btn.tick();
+  right_btn.tick();
 
-   displayTM1637.point(blinkPointsTimer.getStatus());
+  switch (modeStatus) {
+    case Mode::WORK:
+      if (sensor_btn.press()) Serial.println("Sensor btn pressed");
+
+      if (left_btn.press()) Serial.println("Left pressed");
+      if (right_btn.press()) Serial.println("Right pressed");
+
+      if (checkTime.ready()) displayTime();
+      displayTM1637.point(blinkPointsTimer.getStatus());
+
+      break;
+
+    case Mode::EDIT:
+      break;
+
+    case Mode::ALARM:
+      break;
+
+    case Mode::ERROR:
+      break;
+  }
 }
