@@ -10,10 +10,13 @@ boolean flag;
 static uint8_t timeDisp[4];
 
 void displayTime(void) {
-  timeDisp[0] = pDS3231->getHours() / 10;
-  timeDisp[1] = pDS3231->getHours() % 10;
-  timeDisp[2] = pDS3231->getMinutes() / 10;
-  timeDisp[3] = pDS3231->getMinutes() % 10;
+  uint8_t hour, minute;
+  hour = pDS3231->getHours();
+  minute = pDS3231->getMinutes();
+  timeDisp[0] = hour / 10;
+  timeDisp[1] = hour % 10;
+  timeDisp[2] = minute / 10;
+  timeDisp[3] = minute % 10;
   displayTM1637.display(timeDisp);
 }
 
