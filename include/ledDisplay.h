@@ -7,17 +7,17 @@
 GyverTM1637 displayTM1637(TM1637_CLK_PIN, TM1637_DIO_PIN);
 uint32_t Now, clocktimer;
 boolean flag;
-static uint8_t timeDisplay[4];
+static uint8_t timeDisplayArray[4];
 
 void displayTime(void) {
   uint8_t hour, minute;
   hour = pDS3231->getHours();
   minute = pDS3231->getMinutes();
-  timeDisplay[0] = hour / 10;
-  timeDisplay[1] = hour % 10;
-  timeDisplay[2] = minute / 10;
-  timeDisplay[3] = minute % 10;
-  displayTM1637.display(timeDisplay);
+  timeDisplayArray[0] = hour / 10;
+  timeDisplayArray[1] = hour % 10;
+  timeDisplayArray[2] = minute / 10;
+  timeDisplayArray[3] = minute % 10;
+  displayTM1637.display(timeDisplayArray);
 }
 
 void twists() {
