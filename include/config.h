@@ -31,7 +31,7 @@
 /*----------------------| WS2812B LED Ring settings |------------------------*/
 #define WS2812_DI_PIN         8
 #define WS2812_LED_NUM        16
-#define WS2812_BRIGHTNESS     10
+#define WS2812_BRIGHTNESS     40
 #define COLOR_ORDER           GRB
 #define MAX_POWER_MILLIAMPS   500
 #define LED_TYPE              WS2812B
