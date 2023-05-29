@@ -11,14 +11,19 @@ struct RTCAlarmTime {
     uint8_t second;
 };
 
-uint8_t bcd2dec(uint8_t bcd);
-uint8_t dec2bcd(uint8_t dec);
-
+/* ponter's declaration of MicroDS3231 object */
 extern MicroDS3231 *pDS3231;
 
+/* Convert Binary to Decimal */
+uint8_t bcd2dec(uint8_t bcd);
+
+/* Conver Decimal to Binary */
+uint8_t dec2bcd(uint8_t dec);
+
 uint8_t readRegisterDS3231(uint8_t addr, uint8_t reg);
-void writeRegisterDS3231(uint8_t, uint8_t, uint8_t);
+void writeRegisterDS3231(uint8_t addr, uint8_t reg, uint8_t value);
 void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second);
+/* Get alarm 1 hours and minutes */
 RTCAlarmTime getAlarm1(void);
 
 #endif /* _ALARM_TIME_H_ */
