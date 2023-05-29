@@ -12,17 +12,15 @@ class SensorButton {
 
     bool press() {
       bool btnState = digitalRead(_pin);
-      if (btnState && !_flag) {
-        if (_timer->ready() && digitalRead(_pin)) {
-          _flag = true;
-          _timer->resetCount();
-          return true;
-        }
+      if (btnState && !_flag && _timer->ready()) {
+        _flag = true;
+        _timer->resetCounter();
+        return true;
       }
 
       if (!btnState && _flag) {
         _flag = false;
-        _timer->resetCount();
+        _timer->resetCounter();
       }
 
       return false;
