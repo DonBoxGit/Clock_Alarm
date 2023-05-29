@@ -29,7 +29,7 @@ class SensorButton {
   private:
     uint8_t _pin;
     bool _flag = false;
-    Timer *_timer = new Timer(800);
+    Timer *_timer = new Timer(50);
 };
 
 #endif /* _SENSOR_BUTTON_H_ */
