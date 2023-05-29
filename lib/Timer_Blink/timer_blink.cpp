@@ -13,13 +13,10 @@ bool Timer::ready() {
       return false;
 }
 
-void Timer::setPeriod(uint16_t period) {
-  _period = period;
-}
-
-void Timer::resetCount() {
-  _tmr = millis();
-}
+void Timer::setPeriod(uint16_t period) { _period = period; }
+void Timer::resetCounter() { _tmr = millis(); }
+uint16_t Timer::getPeriod() { return _period; }
+uint32_t Timer::getTmr() { return _tmr; }
 
 /*-----------------------------| Class Blink |-------------------------------*/
 Blink::Blink(uint16_t period) : Timer(period) {}
@@ -31,10 +28,5 @@ bool Blink::getStatus() {
   return _flag;
 }
 
-void Blink::resetStatus() {
-  _flag = false;
-}
-
-void Blink::toggle() {
-  _flag = !_flag;
-}
+void Blink::resetStatus() { _flag = false; }
+void Blink::toggle() { _flag = !_flag; }

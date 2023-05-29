@@ -9,9 +9,11 @@ class Timer {
     Timer(uint16_t period = 1000);
     ~Timer();
     
-    bool ready     (void);
-    void resetCount(void);
+    bool ready(void);
+    void resetCounter(void);
     void setPeriod (uint16_t period);
+    uint16_t getPeriod(void);
+    uint32_t getTmr(void);
 
   private:
     uint32_t _tmr = 0;
