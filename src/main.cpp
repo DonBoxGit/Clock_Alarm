@@ -13,6 +13,7 @@
 #include <FastLED.h>
 #include <DFRobotDFPlayerMini.h>
 #include <SoftwareSerial.h>
+#include <EEPROM.h>
 //#include "ledDisplay.h"
 #include "alarmTime.h"
 //#include "timer_blink.h"
@@ -145,6 +146,10 @@ void loop() {
           if (subMenuState == subMenu::SET_MINUTES && --interim_data < 0)
             interim_data = 59;
         }
+
+        if (menuState == Menu::SET_BRIGHTNESS) {
+
+        }
       }
 
       /* Right button activity */
@@ -157,6 +162,10 @@ void loop() {
             interim_data = 0;
           if (subMenuState == subMenu::SET_MINUTES && ++interim_data > 59)
             interim_data = 0;
+        }
+
+        if (menuState == Menu::SET_BRIGHTNESS) {
+
         }
       }
 
@@ -178,6 +187,7 @@ void loop() {
           if (interim_data == 3) {
 
           }
+
         /* Set Clock */
         } else if (menuState == Menu::SET_CLOCK && subMenuState == subMenu::SET_HOURS) {
           dateTime.hour = interim_data;       // Put into DateTime struct an hour
