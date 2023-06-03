@@ -1,18 +1,21 @@
 #include "alarmTime.h"
 
+/* Struct Date and Time */
+DateTime dateTime;
+
 MicroDS3231 *pDS3231 = new MicroDS3231(RTC_I2C_ADDR);
 
 uint8_t bcd2dec(uint8_t bcd) { return ((bcd / 16) * 10) + (bcd % 16); }
 uint8_t dec2bcd(uint8_t dec) { return ((dec / 10) * 16) + (dec % 10); }
 
 uint8_t readRegisterDS3231(uint8_t addr, uint8_t reg) {
-  Wire.begin();
-  Wire.beginTransmission(addr);
-  Wire.write(reg);
-  Wire.requestFrom(addr, 1U);
-  while(!Wire.available()) {}
-  return  Wire.read();
-  Wire.endTransmission();
+    Wire.begin();
+    Wire.beginTransmission(addr);
+    Wire.write(reg);
+    Wire.requestFrom(addr, 1U);
+    while (!Wire.available()) {}
+    return Wire.read();
+    Wire.endTransmission();
 }
 
 void writeRegisterDS3231(uint8_t addr, uint8_t reg, uint8_t val) {
@@ -57,7 +60,7 @@ void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second) {
 
 RTCAlarmTime getAlarm1() {
   uint8_t values[4];
-  RTCAlarmTime a;
+  RTCAlarmTime alarmData;
 
   Wire.beginTransmission(RTC_I2C_ADDR);
 #if ARDUINO >= 100
@@ -77,10 +80,10 @@ RTCAlarmTime getAlarm1() {
 #endif
   }
 
-  a.day = values[0];
-  a.hour = values[1];
-  a.minute = values[2];
-  a.second = values[3];
+  alarmData.day    = values[0];
+  alarmData.hour   = values[1];
+  alarmData.minute = values[2];
+  alarmData.second = values[3];
 
-  return a;
+  return alarmData;
 }
