@@ -22,7 +22,9 @@ uint8_t dec2bcd(uint8_t dec);
 
 uint8_t readRegisterDS3231(uint8_t addr, uint8_t reg);
 void writeRegisterDS3231(uint8_t addr, uint8_t reg, uint8_t value);
-void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second);
+
+void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
+
 /* Get alarm 1 hours and minutes */
 RTCAlarmTime getAlarm1(void);
 
