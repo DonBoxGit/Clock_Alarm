@@ -21,10 +21,12 @@
 
 Blink blinkPointsTimer(500);
 Timer checkTime(1000);
-Timer ws2812Timer(5);
+//Timer ws2812Timer(5);
 
+extern DateTime dateTime;
 RTCAlarmTime alarm1;
 //static int8_t ledBrightnessCounter = 0;
+static int8_t interim_data = 0;
 uint8_t ws2812_counter;
 
 enum class Mode : uint8_t {
@@ -58,10 +60,11 @@ void ws2812_raibow(void) {
 void setup() {
   Serial.begin(9600);
 
-  /* Setup LED settings */
+  /* Setup LED ring settings */
   FastLED.addLeds<WS2812, WS2812_DI_PIN, COLOR_ORDER>(leds, WS2812_LED_NUM);
   FastLED.setBrightness(WS2812_BRIGHTNESS);
 
+  /* Setup TM1637 display */
   displayTM1637.clear();
   displayTM1637.brightness(MIN_BRIGHTNESS);
 
@@ -76,27 +79,34 @@ void setup() {
 
   value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   Serial.println(value);
-  setAlarm_1(20, 5, 0);
+  //setAlarm_1(18, 48, 0);
   delay(100);
   alarm1 = getAlarm1();
 
-  Serial.print(alarm1.hour + ":");
+  Serial.print(alarm1.hour);
+  Serial.print(':');
   Serial.println(alarm1.minute);
 
   /* Allowing an external interrupt on the SQW signal */
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
   attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
 
-  if (!pDS3231->begin())
+  if (!pDS3231->begin()) {
     Serial.println("--DS3231 not found--");
+  } else {
+    dateTime = pDS3231->getTime();
+  }
 
-  if (pDS3231->lostPower())
+  if (pDS3231->lostPower()) {
+    pDS3231->setTime(COMPILE_TIME);
     Serial.println("--DS3231 lost power--");
-
+  }
+  
   displayTime();
   modeStatus = Mode::WORK;
+  subMenuState = subMenu::SET_HOURS;
 }
-
+int8_t tempTimeData;
 void loop() {
   left_btn.tick();
   right_btn.tick();
@@ -104,32 +114,128 @@ void loop() {
   cancel_btn.tick();
 
   switch (modeStatus) {
+/*------------------------------| Mode WORK |--------------------------------*/
     case Mode::WORK:
       if (sensor_btn.press()) Serial.println("Sensor btn pressed");
 
-      if (left_btn.press()) Serial.println("Left pressed");
-      if (right_btn.press()) Serial.println("Right pressed");
-      if (set_btn.press()) {
+      if (left_btn.press() || right_btn.press()) {
         modeStatus = Mode::EDIT;
-        menuStatus = Menu::SET_CLOCK;
+        menuState = Menu::SELECTION_MENU;
+        interim_data = 1;
+        displayTM1637.point(false);
       }
+      
       if (cancel_btn.press()) Serial.println("Cancel pressed");
 
       if (checkTime.ready()) displayTime();
       displayTM1637.point(blinkPointsTimer.getStatus());
 
-      break;
-
+      break; /* End of case WORK */
+    
+/*------------------------------| Mode EDIT |--------------------------------*/
     case Mode::EDIT:
-      if (set_btn.press()) menuStatus = Menu::SET_ALLARM;
-      if (cancel_btn.press()) modeStatus = Mode::WORK;
-      menuPrint();
-      break;
+      /* Left button activity */
+      if (left_btn.press()) {
+        if (menuState == Menu::SELECTION_MENU)
+          if (--interim_data < 1) interim_data = 3;
+        
+        if (menuState == Menu::SET_CLOCK || menuState == Menu::SET_ALLARM) {
+          if (subMenuState == subMenu::SET_HOURS && --interim_data < 0)
+            interim_data = 23;
+          if (subMenuState == subMenu::SET_MINUTES && --interim_data < 0)
+            interim_data = 59;
+        }
+      }
 
+      /* Right button activity */
+      if (right_btn.press()) {
+        if (menuState == Menu::SELECTION_MENU)
+          if (++interim_data > 3) interim_data = 1;
+        
+        if (menuState == Menu::SET_CLOCK || menuState == Menu::SET_ALLARM) {
+          if (subMenuState == subMenu::SET_HOURS && ++interim_data > 23)
+            interim_data = 0;
+          if (subMenuState == subMenu::SET_MINUTES && ++interim_data > 59)
+            interim_data = 0;
+        }
+      }
+
+      /* Set button activity */
+      if (set_btn.press()) {
+        if (menuState == Menu::SELECTION_MENU) {
+          if (interim_data == 1) {
+            menuState = Menu::SET_CLOCK;
+            subMenuState = subMenu::SET_HOURS;
+            interim_data = pDS3231->getHours();
+          }
+
+          if (interim_data == 2) {
+            menuState = Menu::SET_ALLARM;
+            subMenuState = subMenu::SET_HOURS;
+            interim_data = getAlarm1().hour;
+          }
+
+          if (interim_data == 3) {
+
+          }
+        /* Set Clock */
+        } else if (menuState == Menu::SET_CLOCK && subMenuState == subMenu::SET_HOURS) {
+          dateTime.hour = interim_data;       // Put into DateTime struct an hour
+          pDS3231->setTime(dateTime);         // Set the DateTime struct in a RTC DS3231
+          subMenuState = subMenu::SET_MINUTES;
+          interim_data = pDS3231->getMinutes();
+        } else if (menuState == Menu::SET_CLOCK && subMenuState == subMenu::SET_MINUTES) {
+          dateTime.minute = interim_data;     // Put into DateTime struct a minute
+          dateTime.second = 0;                // Seconds don't need to setup
+          pDS3231->setTime(dateTime);         // Set the DateTime struct in a RTC DS3231
+          menuState = Menu::SELECTION_MENU;
+          subMenuState = subMenu::SET_HOURS;
+          interim_data = 1;                   // Reset intermediate data
+        /* Set Allarm 1 */
+        } else if (menuState == Menu::SET_ALLARM && subMenuState == subMenu::SET_HOURS) {
+          setAlarm_1(interim_data, alarm1.minute);
+          subMenuState = subMenu::SET_MINUTES;
+          interim_data = getAlarm1().minute;
+        } else if (menuState == Menu::SET_ALLARM && subMenuState == subMenu::SET_MINUTES) {
+          alarm1.minute = interim_data;
+          setAlarm_1(alarm1.hour, alarm1.minute);
+          menuState = Menu::SELECTION_MENU;
+          subMenuState = subMenu::SET_HOURS;
+          interim_data = 2;
+        }
+      }
+
+      /* Cancel button activity */
+      if (cancel_btn.press()) {
+        if (menuState == Menu::SELECTION_MENU) {  // Exit to main screen
+          modeStatus = Mode::WORK;
+        }
+
+        if (menuState == Menu::SET_CLOCK) {
+          interim_data = 1;
+          menuState = Menu::SELECTION_MENU;
+        }
+        if (menuState == Menu::SET_ALLARM) {
+          interim_data = 2;
+          menuState = Menu::SELECTION_MENU;
+        }
+        if (menuState == Menu::SET_BRIGHTNESS) {
+          interim_data = 3;
+          menuState = Menu::SELECTION_MENU;
+        }
+      }
+      
+      menuPrint(interim_data);
+      break; /* End of case EDIT */
+    
+/*------------------------------| Mode ALARM |-------------------------------*/
     case Mode::ALARM:
-      break;
+      
+      break; /* End of case ALARM */
 
+/*------------------------------| Mode ERROR |-------------------------------*/
     case Mode::ERROR:
-      break;
+      
+      break; /* End of case ERROR */
   }
 }
