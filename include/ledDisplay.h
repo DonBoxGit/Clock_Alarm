@@ -8,26 +8,14 @@ GyverTM1637 displayTM1637(TM1637_CLK_PIN, TM1637_DIO_PIN);
 uint32_t Now, clocktimer;
 boolean flag;
 
-uint8_t* getTimeDS3231() {
-  static uint8_t timeDisplayArray[4];
-  uint8_t hour, minute;
-  hour = pDS3231->getHours();
-  minute = pDS3231->getMinutes();
-  timeDisplayArray[0] = hour / 10;
-  timeDisplayArray[1] = hour % 10;
-  timeDisplayArray[2] = minute / 10;
-  timeDisplayArray[3] = minute % 10;
-  return timeDisplayArray;
-}
-
 void displayTime(void) {
   displayTM1637.display(getTimeDS3231()[0], getTimeDS3231()[1],
                         getTimeDS3231()[2], getTimeDS3231()[3]);
 }
 
-bool checkLedBrightness(int8_t* brightness) {
-  if (*brightness > MAX_BRIGHTNESS || *brightness < MIN_BRIGHTNESS) {
-    *brightness = 0;
+bool checkLedBrightness(int8_t &brightness) {
+  if (brightness > TM1637_MAX_BRIGHTNESS || brightness < TM1637_MIN_BRIGHTNESS) {
+    brightness = 0;
     return false;
   }
   return true;
