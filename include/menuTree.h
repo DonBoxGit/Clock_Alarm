@@ -97,7 +97,7 @@ void menuPrint(int8_t value) {
       break;
 
     case Menu::SET_BRIGHTNESS:
-
+      displayTM1637.display(1, value);
     break;
     }
 }

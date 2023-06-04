@@ -26,7 +26,8 @@ Timer checkTime(1000);
 
 extern DateTime dateTime;
 RTCAlarmTime alarm1;
-//static int8_t ledBrightnessCounter = 0;
+
+static int8_t ledBrightnessCounter = 0;
 static int8_t interim_data = 0;
 uint8_t ws2812_counter;
 
@@ -60,14 +61,20 @@ void ws2812_raibow(void) {
 
 void setup() {
   Serial.begin(9600);
+  /* Read the data from EEPROM memory */
+  EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
+
+  /* Checking data and if they is incorrect then to change */
+  if (!checkLedBrightness(ledBrightnessCounter))
+    EEPROM.put(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
+
+  /* Setup TM1637 display */
+  displayTM1637.clear();
+  displayTM1637.brightness(ledBrightnessCounter);
 
   /* Setup LED ring settings */
   FastLED.addLeds<WS2812, WS2812_DI_PIN, COLOR_ORDER>(leds, WS2812_LED_NUM);
   FastLED.setBrightness(WS2812_BRIGHTNESS);
-
-  /* Setup TM1637 display */
-  displayTM1637.clear();
-  displayTM1637.brightness(MIN_BRIGHTNESS);
 
   uint8_t value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   Serial.println(value);
@@ -80,13 +87,15 @@ void setup() {
 
   value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   Serial.println(value);
-  //setAlarm_1(18, 48, 0);
+  //setAlarm_1(9, 55);
   delay(100);
   alarm1 = getAlarm1();
 
   Serial.print(alarm1.hour);
   Serial.print(':');
-  Serial.println(alarm1.minute);
+  Serial.print(alarm1.minute);
+  Serial.print(":");
+  Serial.println(alarm1.second);
 
   /* Allowing an external interrupt on the SQW signal */
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
@@ -107,7 +116,7 @@ void setup() {
   modeStatus = Mode::WORK;
   subMenuState = subMenu::SET_HOURS;
 }
-int8_t tempTimeData;
+
 void loop() {
   left_btn.tick();
   right_btn.tick();
@@ -126,7 +135,16 @@ void loop() {
         displayTM1637.point(false);
       }
       
-      if (cancel_btn.press()) Serial.println("Cancel pressed");
+      if (cancel_btn.press()) {
+        displayTM1637.point(true);
+        displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+        while (!checkTime.ready()) {
+          displayTM1637.display(alarm1.hour / 10,
+                                alarm1.hour % 10,
+                                alarm1.minute / 10,
+                                alarm1.minute % 10);
+        }
+      }
 
       if (checkTime.ready()) displayTime();
       displayTM1637.point(blinkPointsTimer.getStatus());
@@ -148,7 +166,9 @@ void loop() {
         }
 
         if (menuState == Menu::SET_BRIGHTNESS) {
-
+          if (--interim_data < TM1637_MIN_BRIGHTNESS)
+            interim_data = TM1637_MAX_BRIGHTNESS;
+          displayTM1637.brightness(interim_data);
         }
       }
 
@@ -165,7 +185,9 @@ void loop() {
         }
 
         if (menuState == Menu::SET_BRIGHTNESS) {
-
+          if (++interim_data > TM1637_MAX_BRIGHTNESS) 
+            interim_data = TM1637_MIN_BRIGHTNESS;
+          displayTM1637.brightness(interim_data);
         }
       }
 
@@ -185,7 +207,9 @@ void loop() {
           }
 
           if (interim_data == 3) {
-
+            menuState = Menu::SET_BRIGHTNESS;
+            interim_data = ledBrightnessCounter;
+            displayTM1637.displayByte(_empty, _empty, _empty, _empty);
           }
 
         /* Set Clock */
@@ -203,15 +227,21 @@ void loop() {
           interim_data = 1;                   // Reset intermediate data
         /* Set Allarm 1 */
         } else if (menuState == Menu::SET_ALLARM && subMenuState == subMenu::SET_HOURS) {
-          setAlarm_1(interim_data, alarm1.minute);
+          alarm1.hour = interim_data;
+          setAlarm_1(alarm1.hour, alarm1.minute);
           subMenuState = subMenu::SET_MINUTES;
           interim_data = getAlarm1().minute;
         } else if (menuState == Menu::SET_ALLARM && subMenuState == subMenu::SET_MINUTES) {
           alarm1.minute = interim_data;
-          setAlarm_1(alarm1.hour, alarm1.minute);
+          setAlarm_1(alarm1.hour, alarm1.minute, 0);
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 2;
+        /* Set TM1637 brightness */
+        } else if (menuState == Menu::SET_BRIGHTNESS) {
+          menuState = Menu::SELECTION_MENU;
+          EEPROM.put(TM1637_BRIGHTNESS_ADDR, interim_data);
+          interim_data = 3;
         }
       }
 
