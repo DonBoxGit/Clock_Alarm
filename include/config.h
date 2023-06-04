@@ -19,7 +19,7 @@
 #define A2F_BIT       1     // Alarm 2 Interrupt Flag.
 
 /*----------------| Addresses of values in EEPROM memory |-------------------*/
-#define LED_BRIGHTNESS_ADDR 0x00
+#define TM1637_BRIGHTNESS_ADDR 0x00
 #define VOLUME_VALUE_ADDR   0x01
 
 /*------------------------| DFPlayer Mini settings |-------------------------*/
@@ -27,10 +27,10 @@
 #define DFPLAYER_TX_PIN     4
 
 /*-----------------------| TM1637 Display settings |-------------------------*/
-#define TM1637_CLK_PIN  5
-#define TM1637_DIO_PIN  6
-#define MIN_BRIGHTNESS  0
-#define MAX_BRIGHTNESS  7
+#define TM1637_CLK_PIN         5
+#define TM1637_DIO_PIN         6
+#define TM1637_MIN_BRIGHTNESS  0
+#define TM1637_MAX_BRIGHTNESS  7
 
 /*----------------------| WS2812B LED Ring settings |------------------------*/
 #define WS2812_DI_PIN         8
