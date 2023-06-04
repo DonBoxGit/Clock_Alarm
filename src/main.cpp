@@ -138,12 +138,14 @@ void loop() {
       if (cancel_btn.press()) {
         displayTM1637.point(true);
         displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+        checkTime.resetCounter();
         while (!checkTime.ready()) {
           displayTM1637.display(alarm1.hour / 10,
                                 alarm1.hour % 10,
                                 alarm1.minute / 10,
                                 alarm1.minute % 10);
         }
+        displayTime();
       }
 
       if (checkTime.ready()) displayTime();
@@ -197,6 +199,7 @@ void loop() {
           if (interim_data == 1) {
             menuState = Menu::SET_CLOCK;
             subMenuState = subMenu::SET_HOURS;
+            displayTM1637.point(true);
             interim_data = pDS3231->getHours();
           }
 
@@ -213,15 +216,19 @@ void loop() {
           }
 
         /* Set Clock */
-        } else if (menuState == Menu::SET_CLOCK && subMenuState == subMenu::SET_HOURS) {
-          dateTime.hour = interim_data;       // Put into DateTime struct an hour
-          pDS3231->setTime(dateTime);         // Set the DateTime struct in a RTC DS3231
+        } else if (menuState == Menu::SET_CLOCK &&
+                   subMenuState == subMenu::SET_HOURS) {
+          dateTime.hour = interim_data;   // Transmit data to struct.hour
+          /* Update the  minutes so that they don't get lost */ 
+          dateTime.minute = pDS3231->getMinutes(); 
+          pDS3231->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
-          interim_data = pDS3231->getMinutes();
-        } else if (menuState == Menu::SET_CLOCK && subMenuState == subMenu::SET_MINUTES) {
-          dateTime.minute = interim_data;     // Put into DateTime struct a minute
-          dateTime.second = 0;                // Seconds don't need to setup
-          pDS3231->setTime(dateTime);         // Set the DateTime struct in a RTC DS3231
+          interim_data = pDS3231->getMinutes(); // Updating interim for next editing
+        } else if (menuState == Menu::SET_CLOCK && 
+                   subMenuState == subMenu::SET_MINUTES) {
+          dateTime.minute = interim_data; // Put into DateTime struct a minute
+          dateTime.second = 0;            // Seconds don't need to setup
+          pDS3231->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;                   // Reset intermediate data
