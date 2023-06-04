@@ -2,11 +2,11 @@
 #define _CONFIG_H_
 
 /*-------------------------| RTC DS3231 settings |---------------------------*/
-#define RTC_I2C_ADDR     0x68
-#define ALARM_1_REGISTER 0x07
-#define ALARM_2_REGISTER 0x0B
-#define CONTROL_REGISTER 0x0E
-#define STATUS_REGISTER  0x0F
+#define RTC_I2C_ADDR        0x68
+#define ALARM_1_REGISTER    0x07
+#define ALARM_2_REGISTER    0x0B
+#define CONTROL_REGISTER    0x0E
+#define STATUS_REGISTER     0x0F
 
 /* Bits of Control register */
 #define A1IE_BIT      0     // Alarm 1 Interrupt Enable.
@@ -14,9 +14,13 @@
 #define INTCN_BIT     2     // INTerrupt CoNtrol. 0 - SQW(by Meandr), 1 -INT(by Alarm).
 #define RS1_BIT       3     // Rate Select. Controls the frequency of the meandr.
 #define RS2_BIT       4     // RS1 = 0 and RS2 = 0 , SQW -> 1kHz.
-/* Bits of Status register */
-#define A1F_BIT       0  // Alarm 1 Interrupt Flag.
-#define A2F_BIT       1  // Alarm 2 Interrupt Flag.
+/* Bits of Status register  */
+#define A1F_BIT       0     // Alarm 1 Interrupt Flag.
+#define A2F_BIT       1     // Alarm 2 Interrupt Flag.
+
+/*----------------| Addresses of values in EEPROM memory |-------------------*/
+#define LED_BRIGHTNESS_ADDR 0x00
+#define VOLUME_VALUE_ADDR   0x01
 
 /*------------------------| DFPlayer Mini settings |-------------------------*/
 #define DFPLAYER_RX_PIN     3

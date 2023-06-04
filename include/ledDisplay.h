@@ -25,6 +25,14 @@ void displayTime(void) {
                         getTimeDS3231()[2], getTimeDS3231()[3]);
 }
 
+bool checkLedBrightness(int8_t* brightness) {
+  if (*brightness > MAX_BRIGHTNESS || *brightness < MIN_BRIGHTNESS) {
+    *brightness = 0;
+    return false;
+  }
+  return true;
+}
+
 void twists() {
   // скручивание массив ЦИФР
   byte digs[4] = {3, 5, 7, 1};
