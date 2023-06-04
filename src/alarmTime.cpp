@@ -58,6 +58,18 @@ void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second) {
   writeRegisterDS3231(RTC_I2C_ADDR, STATUS_REGISTER, value);
 }
 
+uint8_t* getTimeDS3231() {
+  static uint8_t timeDisplayArray[4];
+  uint8_t hour, minute;
+  hour = pDS3231->getHours();
+  minute = pDS3231->getMinutes();
+  timeDisplayArray[0] = hour / 10;
+  timeDisplayArray[1] = hour % 10;
+  timeDisplayArray[2] = minute / 10;
+  timeDisplayArray[3] = minute % 10;
+  return timeDisplayArray;
+}
+
 RTCAlarmTime getAlarm1() {
   uint8_t values[4];
   RTCAlarmTime alarmData;
