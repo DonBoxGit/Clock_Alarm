@@ -131,8 +131,7 @@ void loop() {
         showTimerRingEffect.resetCounter();
         while (!showTimerRingEffect.ready()) {
           ws2812_raibow();
-        }
-        
+        } 
         FastLED.clear();
         FastLED.show();
       }
