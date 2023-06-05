@@ -22,6 +22,7 @@
 
 Blink blinkPointsTimer(500);
 Timer checkTime(1000);
+Timer showTimerRingEffect(5000);
 //Timer ws2812Timer(5);
 
 extern DateTime dateTime;
@@ -126,7 +127,15 @@ void loop() {
   switch (modeStatus) {
 /*------------------------------| Mode WORK |--------------------------------*/
     case Mode::WORK:
-      if (sensor_btn.press()) Serial.println("Sensor btn pressed");
+      if (sensor_btn.press()) {
+        showTimerRingEffect.resetCounter();
+        while (!showTimerRingEffect.ready()) {
+          ws2812_raibow();
+        }
+        
+        FastLED.clear();
+        FastLED.show();
+      }
 
       if (left_btn.press() || right_btn.press()) {
         modeStatus = Mode::EDIT;
