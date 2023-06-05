@@ -19,12 +19,14 @@
 #define A2F_BIT       1     // Alarm 2 Interrupt Flag.
 
 /*----------------| Addresses of values in EEPROM memory |-------------------*/
-#define TM1637_BRIGHTNESS_ADDR 0x00
-#define VOLUME_VALUE_ADDR   0x01
+#define TM1637_BRIGHTNESS_ADDR       0x00
+#define DFPLAYER_VOLUME_VALUE_ADDR   0x01
 
 /*------------------------| DFPlayer Mini settings |-------------------------*/
-#define DFPLAYER_RX_PIN     3
-#define DFPLAYER_TX_PIN     4
+#define DFPLAYER_RX_PIN         3
+#define DFPLAYER_TX_PIN         4
+#define DFPLAYER_MIN_VOLUME     0
+#define DFPLAYER_MAX_VOLUME     30
 
 /*-----------------------| TM1637 Display settings |-------------------------*/
 #define TM1637_CLK_PIN         5
