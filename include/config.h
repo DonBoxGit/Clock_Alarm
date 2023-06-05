@@ -39,6 +39,7 @@
 #define COLOR_ORDER           GRB
 #define MAX_POWER_MILLIAMPS   500
 #define LED_TYPE              WS2812B
+#define MAX_POWER_MILLIAMPS   500
 
 /*------------------| Button and sensor connection pins |--------------------*/
 #define LEFT_BUTTON_PIN     9
