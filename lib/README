@@ -12,5 +12,5 @@ The setPeriod(period) method is sestting the period manually in millisecond.
   The Blink class is creating object which to switch the state from true to
 false and back. And to check the status object, use getStatus() method, which
 returns boolean value.
-  Methods resetStatus() and toggle() is resseting and toggle status manually
+  Methods resetStatus() and toggle() is resseting and toggling status manually
 accordingly.
