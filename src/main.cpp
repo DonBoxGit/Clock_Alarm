@@ -61,19 +61,19 @@ void ws2812_raibow(void) {
 }
 
 /* Create softSerial and mp3player objects */
-SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
-DFRobotDFPlayerMini mp3Player;
+//SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
+//DFRobotDFPlayerMini mp3Player;
 
 void setup() {
   Serial.begin(9600);
-  softSerial.begin(9600);
+  //softSerial.begin(9600);
 
-  if (!mp3Player.begin(softSerial)) {
-    Serial.println("We have any problems with DFPlayer!");
-    while(true) {}
-  } else {
-    Serial.println("DFPlayer is online!");
-  }
+  // if (!mp3Player.begin(softSerial)) {
+  //   Serial.println("We have any problems with DFPlayer!");
+  //   while(true) {}
+  // } else {
+  //   Serial.println("DFPlayer is online!");
+  // }
 
   uint8_t mp3Volume; /* Temporary variable for mp3 player volume */
 
@@ -82,8 +82,10 @@ void setup() {
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
 
   /* Constrain and set volume of mp3 player */
-  constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
-  mp3Player.volume(mp3Volume);
+  // mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
+  // mp3Player.volume(mp3Volume);
+  // mp3Player.EQ(DFPLAYER_EQ_NORMAL);
+  // mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
 
   /* Checking data and if they is incorrect then to change */
   if (!checkLedBrightness(ledBrightnessCounter))
