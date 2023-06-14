@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <EncButton.h>
-#include <FastLED.h>
+//#include <FastLED.h>
 #include <DFRobotDFPlayerMini.h>
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
@@ -19,18 +19,19 @@
 //#include "timer_blink.h"
 #include "sensorButton.h"
 #include "menuTree.h"
+#include "ws2812Effects.h"
 
 Blink blinkPointsTimer(500);
 Timer checkTime(1000);
 Timer showTimerRingEffect(5000);
-//Timer ws2812Timer(5);
+Timer ws2812Timer(10);
 
 extern DateTime dateTime;
 RTCAlarmTime alarm1;
 
 static int8_t ledBrightnessCounter = 0;
 static int8_t interim_data = 0;
-uint8_t ws2812_counter;
+static bool ledRingflag = false;
 
 enum class Mode : uint8_t {
   WORK = 0,
@@ -48,17 +49,6 @@ EncButton<EB_TICK, RIGHT_BUTTON_PIN>  right_btn  (INPUT_PULLUP);
 EncButton<EB_TICK, SET_BUTTON_PIN>    set_btn    (INPUT_PULLUP);
 EncButton<EB_TICK, CANCEL_BUTTON_PIN> cancel_btn (INPUT_PULLUP);
 SensorButton sensor_btn(SENSOR_MODULE_PIN);
-
-/* Initialization of LED ring */
-CRGB leds[WS2812_LED_NUM];
-
-void ws2812_raibow(void) {
-  for (int i = 0; i < WS2812_LED_NUM; i++) {
-  leds[i].setHue(ws2812_counter + i * 255 / WS2812_LED_NUM);
-  }
-  ws2812_counter++;
-  FastLED.show();
-}
 
 /* Create softSerial and mp3player objects */
 //SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
@@ -150,13 +140,30 @@ void loop() {
   switch (modeStatus) {
 /*------------------------------| Mode WORK |--------------------------------*/
     case Mode::WORK:
-      if (sensor_btn.press()) {
+      if (sensor_btn.press() && !ledRingflag) {
         showTimerRingEffect.resetCounter();
+        ledRingflag = true;
+      }
+
+      if (ledRingflag) {
+        static uint8_t task = 0;
         while (!showTimerRingEffect.ready()) {
-          ws2812_raibow();
+          func[task]();
+
+          /* Show time while LED Ring works */
+          if (checkTime.ready()) displayTime();
+          displayTM1637.point(blinkPointsTimer.getStatus());
+
+          /* Tracing the sensor button click */
+          set_btn.tick();
+          if (sensor_btn.press()) {
+            if (++task > 5) task = 0;
+            showTimerRingEffect.resetCounter();
+          }
         } 
         FastLED.clear();
         FastLED.show();
+        ledRingflag = false;
       }
 
       if (left_btn.press() || right_btn.press()) {
