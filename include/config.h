@@ -1,6 +1,12 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+/*---------------------| Alarm clock device settings |-----------------------*/
+#define DOTS_TIMER          500
+#define NUMBERS_TIMER       1000
+#define EFFECT_SHOW_TIMER   5000
+#define WS_ALGORITHM_SPEED  10
+
 /*-------------------------| RTC DS3231 settings |---------------------------*/
 #define RTC_I2C_ADDR        0x68
 #define ALARM_1_REGISTER    0x07
