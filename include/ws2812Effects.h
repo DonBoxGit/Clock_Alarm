@@ -1,3 +1,6 @@
+#ifndef _WS_2812_EFFECTS_H_
+#define _WS_2812_EFFECTS_H_
+
 #include <FastLED.h>
 #include "config.h"
 #include "timer_blink.h"
@@ -69,3 +72,5 @@ void (*func[6])(void) = {
   ws2812_focus,
   ws2812_rainbow2
 };
+
+#endif /* _WS_2812_EFFECTS_H_ */
