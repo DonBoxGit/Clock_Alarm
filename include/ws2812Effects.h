@@ -12,6 +12,7 @@ extern  Timer ws2812Timer;
 /* Initialization of LED ring */
 CRGB leds[WS2812_LED_NUM];
 
+/*------------------------------| Effect - 1 |-------------------------------*/
 void ws2812_raibow(void) {
   for (int i = 0; i < WS2812_LED_NUM; i++) {
   leds[i].setHue(ws2812_counter + i * 255 / WS2812_LED_NUM);
@@ -20,6 +21,7 @@ void ws2812_raibow(void) {
   FastLED.show();
 }
 
+/*------------------------------| Effect - 2 |-------------------------------*/
 void ws2812_confetti(void) {
   fadeToBlackBy(leds, WS2812_LED_NUM, 2);
   int pos = random16(WS2812_LED_NUM);
@@ -27,6 +29,7 @@ void ws2812_confetti(void) {
   FastLED.show();
 }
 
+/*------------------------------| Effect - 3 |-------------------------------*/
 void ws2812_runningFire(void) {
   fadeToBlackBy(leds, WS2812_LED_NUM, 2);
   int pos = beatsin16(13, 0, WS2812_LED_NUM - 1);
@@ -34,6 +37,7 @@ void ws2812_runningFire(void) {
   FastLED.show();
 }
 
+/*------------------------------| Effect - 4 |-------------------------------*/
 void ws2812_cyclone(void) {
   while (!ws2812Timer.ready()) {
   for (int i = 0; i < WS2812_LED_NUM; i++) {
@@ -46,6 +50,7 @@ void ws2812_cyclone(void) {
   }
 }
 
+/*------------------------------| Effect - 5 |-------------------------------*/
 void ws2812_focus(void) {
   while (!ws2812Timer.ready()) {
     fadeToBlackBy(leds, WS2812_LED_NUM, 2);
@@ -56,6 +61,7 @@ void ws2812_focus(void) {
   }
 }
 
+/*------------------------------| Effect - 6 |-------------------------------*/
 void ws2812_rainbow2(void) {
   while (!ws2812Timer.ready()) {
     fill_rainbow( leds, WS2812_LED_NUM, base++, 7);
@@ -64,6 +70,7 @@ void ws2812_rainbow2(void) {
   }
 }
 
+/*-------------------------| The array of effects |--------------------------*/
 void (*func[6])(void) = {
   ws2812_raibow,
   ws2812_confetti,
