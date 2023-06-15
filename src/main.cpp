@@ -21,10 +21,10 @@
 #include "menuTree.h"
 #include "ws2812Effects.h"
 
-Blink blinkPointsTimer(500);
-Timer checkTime(1000);
-Timer showTimerRingEffect(5000);
-Timer ws2812Timer(10);
+Blink blinkPointsTimer(DOTS_TIMER);
+Timer checkTime(NUMBERS_TIMER);
+Timer showTimerRingEffect(EFFECT_SHOW_TIMER);
+Timer ws2812Timer(WS_ALGORITHM_SPEED);
 
 extern DateTime dateTime;
 RTCAlarmTime alarm1;
@@ -33,6 +33,7 @@ static int8_t ledBrightnessCounter = 0;
 static int8_t interim_data = 0;
 static bool ledRingflag = false;
 
+/* Working modes of Alarm clock device */
 enum class Mode : uint8_t {
   WORK = 0,
   EDIT,
