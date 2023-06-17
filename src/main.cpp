@@ -152,6 +152,11 @@ void loop() {
           mp3Player.play(3);
           mp3FlagPlayer = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+          displayTM1637.point(false);
+          displayTM1637.display(mp3Volume / 10,
+                                mp3Volume % 10,
+                                        _empty,
+                                        _empty);
           Serial.println("Play!");
         } else {
           mp3Player.pause();
