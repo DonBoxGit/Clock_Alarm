@@ -146,10 +146,12 @@ void loop() {
 /*------------------------------| Mode WORK |--------------------------------*/
     case Mode::WORK:
     static bool mp3FlagPlayer = false;
+    static bool buttonsVolumeFlag = false;
       if (set_btn.press()) {
         if (!mp3FlagPlayer) {
           mp3Player.play(3);
           mp3FlagPlayer = true;
+          displayTM1637.displayByte(_empty, _empty, _empty, _empty);
           Serial.println("Play!");
         } else {
           mp3Player.pause();
@@ -195,9 +197,13 @@ void loop() {
       } else { /* When the music play */
         if (left_btn.press()) {
           mp3Player.volume(--mp3Volume);
+          buttonsVolumeFlag = true;
+          displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
         if (right_btn.press()) {
           mp3Player.volume(++mp3Volume);
+          buttonsVolumeFlag = true;
+          displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
       }
       
@@ -214,8 +220,18 @@ void loop() {
         displayTime();
       }
 
-      if (checkTime.ready()) displayTime();
-      displayTM1637.point(blinkPointsTimer.getStatus());
+      if (!mp3FlagPlayer) {
+        if (checkTime.ready()) displayTime();
+        displayTM1637.point(blinkPointsTimer.getStatus());
+      } else {
+        if (buttonsVolumeFlag) {
+          displayTM1637.display(mp3Volume / 10,
+                                mp3Volume % 10,
+                                        _empty,
+                                        _empty);
+          buttonsVolumeFlag = false;
+        }
+      }
 
       break; /* End of case WORK */
     
