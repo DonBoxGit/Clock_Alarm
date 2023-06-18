@@ -33,7 +33,8 @@ RTCAlarmTime alarm1;
 static int8_t ledBrightnessCounter = 0;
 static int8_t interim_data = 0;
 static bool ledRingflag = false;
-static uint8_t mp3Volume;
+static int8_t mp3Volume;
+static uint8_t effectNubmer;
 
 /* Working modes of Alarm clock device */
 enum class Mode : uint8_t {
@@ -72,9 +73,7 @@ void setup() {
   /* Read the data from EEPROM memory */
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
-  Serial.print ("Volume mp3: ");
-  Serial.println(mp3Volume);
-  mp3Volume = 25;
+  EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNubmer);
 
   /* Constrain and set volume of mp3 player */
   mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
@@ -153,28 +152,24 @@ void loop() {
           mp3FlagPlayer = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
           displayTM1637.point(false);
-          displayTM1637.display(mp3Volume / 10,
-                                mp3Volume % 10,
-                                        _empty,
-                                        _empty);
-          Serial.println("Play!");
+          displayTM1637.display(0, mp3Volume / 10);
+          displayTM1637.display(1, mp3Volume % 10);
         } else {
           mp3Player.pause();
           mp3FlagPlayer = false;
           EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
-          Serial.println("Stop");
         }
       }
 
-      if (sensor_btn.press() && !ledRingflag) {
+      if (sensor_btn.press() && !ledRingflag && !mp3FlagPlayer) {
         ringEffectShowTimer.resetCounter();
         ledRingflag = true;
+        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNubmer);
       }
 
       if (ledRingflag) {
-        static uint8_t task = 0;
         while (!ringEffectShowTimer.ready()) {
-          func[task]();
+          func[effectNubmer]();
 
           /* Show time while LED Ring works */
           if (checkTime.ready()) displayTime();
@@ -183,7 +178,7 @@ void loop() {
           /* Tracing the sensor button click */
           set_btn.tick();
           if (sensor_btn.press()) {
-            if (++task > 5) task = 0;
+            if (++effectNubmer > 5) effectNubmer = 0;
             ringEffectShowTimer.resetCounter();
           }
         } 
@@ -201,18 +196,20 @@ void loop() {
         }
       } else { /* When the music play */
         if (left_btn.press()) {
-          mp3Player.volume(--mp3Volume);
+          if (--mp3Volume < DFPLAYER_MIN_VOLUME) mp3Volume = DFPLAYER_MIN_VOLUME;
+          mp3Player.volume(mp3Volume);
           buttonsVolumeFlag = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
         if (right_btn.press()) {
-          mp3Player.volume(++mp3Volume);
+          if (++mp3Volume > DFPLAYER_MAX_VOLUME) mp3Volume = DFPLAYER_MAX_VOLUME;
+          mp3Player.volume(mp3Volume);
           buttonsVolumeFlag = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
       }
       
-      if (cancel_btn.press()) {
+      if (cancel_btn.press() && !mp3FlagPlayer) {
         displayTM1637.point(true);
         displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         checkTime.resetCounter();
@@ -230,10 +227,8 @@ void loop() {
         displayTM1637.point(blinkPointsTimer.getStatus());
       } else {
         if (buttonsVolumeFlag) {
-          displayTM1637.display(mp3Volume / 10,
-                                mp3Volume % 10,
-                                        _empty,
-                                        _empty);
+          displayTM1637.display(0, mp3Volume / 10);
+          displayTM1637.display(1, mp3Volume % 10);
           buttonsVolumeFlag = false;
         }
       }
