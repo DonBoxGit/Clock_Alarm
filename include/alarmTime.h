@@ -22,6 +22,9 @@ uint8_t dec2bcd(uint8_t dec);
 
 uint8_t readRegisterDS3231(uint8_t addr, uint8_t reg);
 void writeRegisterDS3231(uint8_t addr, uint8_t reg, uint8_t value);
+
+/* Return the pointer Array uint8_t data of time.
+First two digits is hours and second two digits is minutes. */
 uint8_t* getTimeDS3231(void);
 
 /* Set and get alarm 1 hours and minutes */
