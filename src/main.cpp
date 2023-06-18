@@ -45,7 +45,7 @@ enum class Mode : uint8_t {
 } modeStatus;
 
 /* RTC Alarm interrupt function */
-void ISR_RTC_INT() { Serial.println("RTC Alarm trigered!"); }
+void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
 
 /* Initialization of buttons for control */
 EncButton<EB_TICK, LEFT_BUTTON_PIN>   left_btn   (INPUT_PULLUP);
@@ -155,16 +155,16 @@ void loop() {
           displayTM1637.display(0, mp3Volume / 10);
           displayTM1637.display(1, mp3Volume % 10);
         } else {
-          mp3Player.pause();
+          mp3Player.stop();
           mp3FlagPlayer = false;
           EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
+          displayTime();
         }
       }
 
       if (sensor_btn.press() && !ledRingflag && !mp3FlagPlayer) {
         ringEffectShowTimer.resetCounter();
         ledRingflag = true;
-        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNubmer);
       }
 
       if (ledRingflag) {
@@ -178,13 +178,14 @@ void loop() {
           /* Tracing the sensor button click */
           set_btn.tick();
           if (sensor_btn.press()) {
-            if (++effectNubmer > 5) effectNubmer = 0;
+            if (++effectNubmer > (QUANTITY_EFFECTS - 1)) effectNubmer = 0;
             ringEffectShowTimer.resetCounter();
           }
         } 
         FastLED.clear();
         FastLED.show();
         ledRingflag = false;
+        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNubmer);
       }
 
       if (!mp3FlagPlayer) {
@@ -201,6 +202,7 @@ void loop() {
           buttonsVolumeFlag = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
+
         if (right_btn.press()) {
           if (++mp3Volume > DFPLAYER_MAX_VOLUME) mp3Volume = DFPLAYER_MAX_VOLUME;
           mp3Player.volume(mp3Volume);
@@ -361,6 +363,26 @@ void loop() {
     
 /*------------------------------| Mode ALARM |-------------------------------*/
     case Mode::ALARM:
+      mp3Player.play(3);
+      
+      while (true) {
+        func[effectNubmer]();
+
+        /* Show time while LED Ring works */
+        if (checkTime.ready()) displayTime();
+        displayTM1637.point(blinkPointsTimer.getStatus());
+
+        /* Tracing the sensor button click */
+        set_btn.tick();
+        if (sensor_btn.press()) {
+          modeStatus = Mode::WORK;
+          mp3Player.stop();
+          break;
+        }
+      }
+
+      FastLED.clear();
+      FastLED.show();
       
       break; /* End of case ALARM */
 
