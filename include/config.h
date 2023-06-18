@@ -27,6 +27,7 @@
 /*----------------| Addresses of values in EEPROM memory |-------------------*/
 #define TM1637_BRIGHTNESS_ADDR       0x00
 #define DFPLAYER_VOLUME_VALUE_ADDR   0x01
+#define WS_EFFECT_NUMBER_ADDR        0x02
 
 /*------------------------| DFPlayer Mini settings |-------------------------*/
 #define DFPLAYER_RX_PIN         3
