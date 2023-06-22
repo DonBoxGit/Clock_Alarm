@@ -7,50 +7,7 @@
  *                                     Autor: Roman Yakubovskiy   *
  ******************************************************************/
 
-#include <Arduino.h>
-#include <Wire.h>
-#include <EncButton.h>
-//#include <FastLED.h>
-#include <DFRobotDFPlayerMini.h>
-#include <SoftwareSerial.h>
-#include <EEPROM.h>
-//#include "ledDisplay.h"
-#include "alarmTime.h"
-//#include "timer_blink.h"
-#include "sensorButton.h"
-#include "menuTree.h"
-#include "ws2812Effects.h"
-
-Blink blinkPointsTimer(DOTS_TIMER);
-Timer checkTime(NUMBERS_TIMER);
-Timer ringEffectShowTimer(EFFECT_SHOW_TIMER);
-Timer ws2812Timer(WS_ALGORITHM_SPEED);
-
-extern DateTime dateTime;
-RTCAlarmTime alarm1;
-
-static int8_t ledBrightnessCounter = 0;
-static int8_t interim_data = 0;
-static bool ledRingflag = false;
-static int8_t mp3Volume;
-static uint8_t effectNubmer;
-
-/* Working modes of Alarm clock device */
-enum class Mode : uint8_t {
-  WORK = 0,
-  EDIT,
-  ALARM,
-  ERROR
-} modeStatus;
-
-/* Enumeration of errors */
-enum class AlarmClockErrors : uint8_t {
-  RTC_I2C_NOT_RESPONSE = 0,
-  DFPLAYER_SERIAL_ERROR
-} alarmClockError;
-
-/* RTC Alarm interrupt function */
-void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
+#include "main.h"
 
 /* Initialization of buttons for control */
 EncButton<EB_TICK, LEFT_BUTTON_PIN>   left_btn   (INPUT_PULLUP);
