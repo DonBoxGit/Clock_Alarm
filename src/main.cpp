@@ -25,7 +25,6 @@ Blink blinkPointsTimer(DOTS_TIMER);
 Timer checkTime(NUMBERS_TIMER);
 Timer ringEffectShowTimer(EFFECT_SHOW_TIMER);
 Timer ws2812Timer(WS_ALGORITHM_SPEED);
-//Timer volumeShowTimer(1200);
 
 extern DateTime dateTime;
 RTCAlarmTime alarm1;
@@ -44,6 +43,12 @@ enum class Mode : uint8_t {
   ERROR
 } modeStatus;
 
+/* Enumeration of errors */
+enum class AlarmClockErrors : uint8_t {
+  RTC_I2C_NOT_RESPONSE = 0,
+  DFPLAYER_SERIAL_ERROR
+} alarmClockError;
+
 /* RTC Alarm interrupt function */
 void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
 
@@ -60,30 +65,20 @@ DFRobotDFPlayerMini mp3Player;
 
 void setup() {
   Serial.begin(9600);
+  Serial.setTimeout(60000);
   softSerial.begin(9600);
-
-  /* Use software Serial to communicate with mp3 player */
-  if (!mp3Player.begin(softSerial)) {
-    Serial.println("We have any problems with DFPlayer!");
-    while(true) {}
-  } else {
-    Serial.println("DFPlayer is online!");
-  }
 
   /* Read the data from EEPROM memory */
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
   EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNubmer);
 
-  /* Constrain and set volume of mp3 player */
-  mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
-  mp3Player.volume(mp3Volume);
-  mp3Player.EQ(DFPLAYER_EQ_NORMAL);
-  mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
-
   /* Checking data and if they is incorrect then to change */
-  if (!checkLedBrightness(ledBrightnessCounter))
+  if (!checkLedBrightness(ledBrightnessCounter)) {
     EEPROM.put(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
+    eeprom_busy_wait();
+    _delay_ms(10);
+  }
 
   /* Setup TM1637 display */
   displayTM1637.clear();
@@ -94,44 +89,49 @@ void setup() {
   FastLED.setBrightness(WS2812_BRIGHTNESS);
 
   uint8_t value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
-  Serial.println(value);
-  if (value != 0x00) {
-    value = 0x00;
-  }
+  if (value != 0x00) value = 0x00;
 
   /* Allow interrupt to INT/SQW by Alarm 1 */
   value |= (1 << A1IE_BIT) | (1 << INTCN_BIT);
   writeRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER, value);
 
-  value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
-  Serial.println(value);
-  delay(10);
+  // value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   alarm1 = getAlarm1();
-
-  Serial.print(alarm1.hour);
-  Serial.print(':');
-  Serial.print(alarm1.minute);
-  Serial.print(":");
-  Serial.println(alarm1.second);
 
   /* Allowing an external interrupt on the SQW signal */
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
   attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
 
-  if (!pDS3231->begin()) {
-    Serial.println("--DS3231 not found--");
+  /* Checking the equipment for the response */
+  if (!mp3Player.begin(softSerial)) {
+    modeStatus = Mode::ERROR;
+    alarmClockError = AlarmClockErrors::DFPLAYER_SERIAL_ERROR;
+  } else if (!pDS3231->begin()) {
+    modeStatus = Mode::ERROR;
+    alarmClockError = AlarmClockErrors::RTC_I2C_NOT_RESPONSE;
   } else {
     dateTime = pDS3231->getTime();
+    modeStatus = Mode::WORK;
+    subMenuState = subMenu::SET_HOURS;
   }
 
+  /* Constrain and set volume of mp3 player */
+  mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
+  mp3Player.volume(mp3Volume);
+  mp3Player.EQ(DFPLAYER_EQ_NORMAL);
+  mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
+
+  /* If the battety too is low level and the power is lost */
   if (pDS3231->lostPower()) {
     pDS3231->setTime(COMPILE_TIME);
-    Serial.println("--DS3231 lost power--");
+    modeStatus = Mode::EDIT;
+    menuState = Menu::SET_CLOCK;
+    subMenuState = subMenu::SET_HOURS;
+    displayTM1637.point(true);
+    interim_data = pDS3231->getHours();
   }
   
   displayTime();
-  modeStatus = Mode::WORK;
-  subMenuState = subMenu::SET_HOURS;
 }
 
 void loop() {
@@ -158,6 +158,8 @@ void loop() {
           mp3Player.stop();
           mp3FlagPlayer = false;
           EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
+          eeprom_busy_wait();
+          _delay_ms(10);
           displayTime();
         }
       }
@@ -186,6 +188,8 @@ void loop() {
         FastLED.show();
         ledRingflag = false;
         EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNubmer);
+        eeprom_busy_wait();
+        _delay_ms(10);
       }
 
       if (!mp3FlagPlayer) {
@@ -211,15 +215,20 @@ void loop() {
         }
       }
       
-      if (cancel_btn.press() && !mp3FlagPlayer) {
-        displayTM1637.point(true);
-        displayTM1637.displayByte(_empty, _empty, _empty, _empty);
-        checkTime.resetCounter();
-        while (!checkTime.ready()) {
-          displayTM1637.display(alarm1.hour / 10,
-                                alarm1.hour % 10,
-                                alarm1.minute / 10,
-                                alarm1.minute % 10);
+      if (cancel_btn.press()) {
+        if (!mp3FlagPlayer) {
+          displayTM1637.point(true);
+          displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+          checkTime.resetCounter();
+          while (!checkTime.ready()) {
+            displayTM1637.display(alarm1.hour / 10,
+                                  alarm1.hour % 10,
+                                  alarm1.minute / 10,
+                                  alarm1.minute % 10);
+          }
+        } else {
+          mp3Player.stop();
+          mp3FlagPlayer = false;
         }
         displayTime();
       }
@@ -334,6 +343,8 @@ void loop() {
         } else if (menuState == Menu::SET_BRIGHTNESS) {
           menuState = Menu::SELECTION_MENU;
           EEPROM.put(TM1637_BRIGHTNESS_ADDR, interim_data);
+          eeprom_busy_wait();
+          _delay_ms(10);
           interim_data = 3;
         }
       }
@@ -363,8 +374,22 @@ void loop() {
     
 /*------------------------------| Mode ALARM |-------------------------------*/
     case Mode::ALARM:
+      {
+      displayTime();
+
+       /* Reset the millis counter */
+      extern volatile unsigned long timer0_millis;
+      extern volatile unsigned long  timer0_overflow_count;
+      cli();
+      timer0_millis = 0;
+      timer0_overflow_count = 0;
+      sei();
+
+      /* Allocate memmory for variable */
+      uint32_t* _tmr = new uint32_t(millis());
+
       mp3Player.play(3);
-      
+
       while (true) {
         func[effectNubmer]();
 
@@ -374,27 +399,40 @@ void loop() {
 
         /* Tracing the sensor button click */
         set_btn.tick();
-        if (sensor_btn.press()) {
+        if (sensor_btn.press() ||
+            (millis() - *_tmr) > (1000UL * 60UL * (uint32_t)alarmTimeOut)) {
           modeStatus = Mode::WORK;
           mp3Player.stop();
           break;
         }
       }
 
+      delete _tmr;
       FastLED.clear();
       FastLED.show();
-      
+      }
+
       break; /* End of case ALARM */
 
 /*------------------------------| Mode ERROR |-------------------------------*/
     case Mode::ERROR:
-    
-      /*
-      RTC Erorrs
-      MP3 player Erorrs
-      and other errors
-      */
-      
+      uint8_t ledPossitionCursor = 3;
+      displayTM1637.point(true);
+      displayTM1637.displayByte(_E, _r, _0, _empty);
+
+      switch (alarmClockError) {
+        case AlarmClockErrors::RTC_I2C_NOT_RESPONSE:
+          displayTM1637.display(ledPossitionCursor,
+                                (uint8_t)AlarmClockErrors::RTC_I2C_NOT_RESPONSE);
+          break;
+        
+        case AlarmClockErrors::DFPLAYER_SERIAL_ERROR:
+          displayTM1637.display(ledPossitionCursor,
+                                (uint8_t)AlarmClockErrors::DFPLAYER_SERIAL_ERROR);
+          break;
+      }
+
+      while (true) {}
       break; /* End of case ERROR */
   }
 }
