@@ -71,7 +71,7 @@ void ws2812_rainbow2(void) {
 }
 
 /*-------------------------| The array of effects |--------------------------*/
-void (*func[6])(void) = {
+void (*func[QUANTITY_EFFECTS])(void) = {
   ws2812_raibow,
   ws2812_confetti,
   ws2812_runningFire,
