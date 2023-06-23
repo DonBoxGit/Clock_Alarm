@@ -143,7 +143,8 @@ void loop() {
             if (++effectNubmer > (QUANTITY_EFFECTS - 1)) effectNubmer = 0;
             ringEffectShowTimer.resetCounter();
           }
-        } 
+        }
+        
         FastLED.clear();
         FastLED.show();
         ledRingflag = false;
