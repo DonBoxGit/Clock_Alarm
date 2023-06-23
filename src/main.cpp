@@ -3,6 +3,9 @@
  *                            ver. 1.0.0                          *
  *    Used RTC DS3231 on I2C wire, 4-Digit LED Display, WS2812B   *
  *  LED Ring 16 leds and DFPlayer Mini.                           *
+ *    Libraries are used EncButton, GyverTM1637 and microDS3231   *
+ *  by AlexGyver, DFRobotDFPlayerMini by DFRobot and Fast LED     *
+ *  by Daniel Garcia.                                             *
  *                                                                *
  *                                     Autor: Roman Yakubovskiy   *
  ******************************************************************/
