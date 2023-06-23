@@ -15,13 +15,13 @@
 #define CONTROL_REGISTER    0x0E    // Регистр котроля DS3231
 #define STATUS_REGISTER     0x0F    // Регистр статуса DS3231
 
-/* Биты регистра контроля */
+/* Биты регистра контроля RTC DS3231 */
 #define A1IE_BIT      0     // Вкл прерывание будильником 1
 #define A2IE_BIT      1     // Вкл прерывание будильником 2
 #define INTCN_BIT     2     // INTerrupt CoNtrol. 0 - SQW(by Meandr), 1 -INT(by Alarm)
 #define RS1_BIT       3     // RS1 и  RS2биты отвечающие за частоту меандра
 #define RS2_BIT       4     // RS1 = 0 and RS2 = 0 , SQW -> 1kHz
-/* Биты статусного регистра  */
+/* Биты статусного регистра RTC DS3231 */
 #define A1F_BIT       0     // Флаг прерывания будильника 1
 #define A2F_BIT       1     // Флаг прерывания будильника 2
 
