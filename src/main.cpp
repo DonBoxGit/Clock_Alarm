@@ -1,14 +1,17 @@
-/******************************************************************
- *                      Clock Alarm Mp3Player                     *
- *                            ver. 1.0.0                          *
- *    Used RTC DS3231 on I2C wire, 4-Digit LED Display, WS2812B   *
- *  LED Ring 16 leds and DFPlayer Mini.                           *
- *    Libraries are used EncButton, GyverTM1637 and microDS3231   *
- *  by AlexGyver, DFRobotDFPlayerMini by DFRobot and Fast LED     *
- *  by Daniel Garcia.                                             *
- *                                                                *
- *                                     Autor: Roman Yakubovskiy   *
- ******************************************************************/
+/*********************************************************************
+ *                      Clock Alarm Mp3Player                        *
+ *                            ver. 1.0.0                             *
+ *    Used RTC DS3231 on I2C wire, 4-Digit LED Display, WS2812B      *
+ *  LED Ring 16 leds and DFPlayer Mini.                              *
+ *    Libraries are used EncButton, GyverTM1637 and microDS3231      *
+ *  by AlexGyver, DFRobotDFPlayerMini by DFRobot and Fast LED        *
+ *  by Daniel Garcia.                                                *
+ *    Also used EEPROM libraries original copyright David A. Mellis  *
+ *  (New version by Christopher Andrews 2015), and TwoWire.h library *
+ * for Arduino & Wiring copyright Nicholas Zambetti.                 *
+ *                                                                   *
+ *                                       Autor: Roman Yakubovskiy    *
+ *********************************************************************/
 
 #include "main.h"
 
