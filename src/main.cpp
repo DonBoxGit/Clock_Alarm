@@ -363,7 +363,6 @@ void loop() {
         displayTM1637.point(blinkPointsTimer.getStatus());
 
         /* Tracing the sensor button click */
-        //set_btn.tick();
         if (sensor_btn.press() ||
             (millis() - *_tmr) > (1000UL * 60UL * (uint32_t)alarmTimeOut)) {
           modeStatus = Mode::WORK;
