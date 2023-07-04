@@ -337,8 +337,7 @@ void loop() {
       break; /* End of case EDIT */
     
 /*------------------------------| Mode ALARM |-------------------------------*/
-    case Mode::ALARM:
-      {
+    case Mode::ALARM: {
       displayTime();
 
        /* Reset the millis counter */

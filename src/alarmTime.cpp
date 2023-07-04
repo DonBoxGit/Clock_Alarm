@@ -99,4 +99,3 @@ uint8_t* getTimeDS3231() {
   timeDisplayArray[3] = minute % 10;
   return timeDisplayArray;
 }
-
