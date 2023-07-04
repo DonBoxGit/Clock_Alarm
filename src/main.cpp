@@ -50,6 +50,8 @@ void setup() {
   /* Setup LED ring settings */
   FastLED.addLeds<WS2812, WS2812_DI_PIN, COLOR_ORDER>(leds, WS2812_LED_NUM);
   FastLED.setBrightness(WS2812_BRIGHTNESS);
+  FastLED.clear();
+  FastLED.show();
 
   uint8_t value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   if (value != 0x00) value = 0x00;
@@ -361,7 +363,7 @@ void loop() {
         displayTM1637.point(blinkPointsTimer.getStatus());
 
         /* Tracing the sensor button click */
-        set_btn.tick();
+        //set_btn.tick();
         if (sensor_btn.press() ||
             (millis() - *_tmr) > (1000UL * 60UL * (uint32_t)alarmTimeOut)) {
           modeStatus = Mode::WORK;
