@@ -24,7 +24,7 @@ static int8_t ledBrightnessCounter = 0;
 static int8_t interim_data = 0;
 static bool ledRingflag = false;
 static int8_t mp3Volume;
-static uint8_t effectNubmer;
+static uint8_t effectNumber;
 
 /* Working modes of Alarm clock device */
 enum class Mode : uint8_t {

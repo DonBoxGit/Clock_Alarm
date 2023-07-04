@@ -34,7 +34,7 @@ void setup() {
   /* Read the data from EEPROM memory */
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
-  EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNubmer);
+  EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNumber);
 
   /* Checking data and if they is incorrect then to change */
   if (!checkLedBrightness(ledBrightnessCounter)) {
@@ -136,7 +136,7 @@ void loop() {
 
       if (ledRingflag) {
         while (!ringEffectShowTimer.ready()) {
-          func[effectNubmer]();
+          func[effectNumber]();
 
           /* Show time while LED Ring works */
           if (checkTime.ready()) displayTime();
@@ -145,7 +145,7 @@ void loop() {
           /* Tracing the sensor button click */
           set_btn.tick();
           if (sensor_btn.press()) {
-            if (++effectNubmer > (QUANTITY_EFFECTS - 1)) effectNubmer = 0;
+            if (++effectNumber > (QUANTITY_EFFECTS - 1)) effectNumber = 0;
             ringEffectShowTimer.resetCounter();
           }
         }
@@ -153,7 +153,7 @@ void loop() {
         FastLED.clear();
         FastLED.show();
         ledRingflag = false;
-        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNubmer);
+        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNumber);
         eeprom_busy_wait();
         _delay_ms(10);
       }
@@ -350,13 +350,13 @@ void loop() {
       timer0_overflow_count = 0;
       sei();
 
-      /* Allocate memmory for variable */
+      /* Allocate memmory for timer variable */
       uint32_t* _tmr = new uint32_t(millis());
 
       mp3Player.play(3);
 
       while (true) {
-        func[effectNubmer]();
+        func[effectNumber]();
 
         /* Show time while LED Ring works */
         if (checkTime.ready()) displayTime();
