@@ -10,7 +10,7 @@
       Do somethink ...
     }
 ```
-###### The resetCounter() method is resseting the milliseconds counter. The ```setPeriod(period)``` method is sestting the period manually in millisecond. <br><br>For example:
+###### The `resetCounter()` method is resseting the milliseconds counter. The ```setPeriod(period)``` method is sestting the period manually in millisecond. <br><br>For example:
 ```c++
     displayShowTimer.resetCounter();
     displayShowTimer.setPeriod(550);
