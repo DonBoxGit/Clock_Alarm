@@ -2,6 +2,7 @@
 #define _ALARM_TIME_H_
 
 #include <microDS3231.h>
+#include <GyverTM1637.h>
 #include "config.h"
 
 struct RTCAlarmTime {
