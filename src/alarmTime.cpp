@@ -93,10 +93,7 @@ uint8_t* getTimeDS3231() {
   uint8_t hour, minute;
   hour = pDS3231->getHours();
   minute = pDS3231->getMinutes();
-  if (hour / 10)
-    timeDisplayArray[0] = hour / 10;
-  else 
-    timeDisplayArray[0] = _empty;
+  timeDisplayArray[0] = hour / 10;
   timeDisplayArray[1] = hour % 10;
   timeDisplayArray[2] = minute / 10;
   timeDisplayArray[3] = minute % 10;
