@@ -51,12 +51,14 @@
 #define LED_TYPE              WS2812B   // Тип светодиодной ленты
 #define QUANTITY_EFFECTS      6         // Количество эффектов
 
-/*------------------------| Пины кнопок и сенсора |--------------------------*/
+/*------------------------| Пины кнопок и сенсоров |-------------------------*/
 #define LEFT_BUTTON_PIN     9       // Пин кнопки Влево
 #define RIGHT_BUTTON_PIN    10      // Пин кнопки Вправо
 #define SET_BUTTON_PIN      11      // Пин Кнопки Установить
 #define CANCEL_BUTTON_PIN   12      // Пин Кнопки Отмена
 #define SENSOR_MODULE_PIN   7       // Пин сенсорного модуля
 #define ISR_INPUT_PIN       2       // Пин входа прерывания(от RTC)
+#define FR1_PIN             A0      // Пин фото резистора
+#define POWER_SENSOR_PIN    A1      // Пин наличия питания(батарея/БП)
 
 #endif /* _CONFIG_H_ */
