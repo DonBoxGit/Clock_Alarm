@@ -396,7 +396,17 @@ void loop() {
           break;
       }
 
-      while (true) {}
+      while (true) {
+        left_btn.tick();
+        right_btn.tick();
+        set_btn.tick();
+        cancel_btn.tick();
+
+        if (left_btn.press() || right_btn.press() ||
+            set_btn.press() || cancel_btn.press()) {
+          modeStatus = Mode::WORK;
+        }
+      }
       break; /* End of case ERROR */
   }
 }
