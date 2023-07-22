@@ -406,6 +406,7 @@ void loop() {
             set_btn.press() || cancel_btn.press()) {
           modeStatus = Mode::WORK;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+          break;
         }
       }
       break; /* End of case ERROR */
