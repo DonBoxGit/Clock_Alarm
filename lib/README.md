@@ -1,4 +1,5 @@
 ##### Timer_Blink library organizes the time delay and the time switch state.
+
 ###### To create an object, need to apply the constructor the Timer and as parameter to point time as milliseconds. <br> 
 ###### For example:
 ```c++
