@@ -24,4 +24,4 @@ bool checkLedBrightness(int8_t &brightness) {
   return true;
 }
 
-#endif /* _LED_DISPLAY_ */
+#endif /* _LED_DISPLAY_H_ */
