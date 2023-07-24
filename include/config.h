@@ -59,6 +59,6 @@
 #define SENSOR_MODULE_PIN   7       // Пин сенсорного модуля
 #define ISR_INPUT_PIN       2       // Пин входа прерывания(от RTC)
 #define FR1_PIN             A0      // Пин фото резистора
-#define POWER_SENSOR_PIN    A1      // Пин наличия питания(батарея/БП)
+#define POWER_SENSOR_PIN    A1      // Пин сенсора наличия питания(батарея/БП)
 
 #endif /* _CONFIG_H_ */
