@@ -43,7 +43,7 @@
 #define TM1637_MAX_BRIGHTNESS  7    // Максимальня яркость дисплея
 
 /*---------------|Настройки светодиодного кольца  WS2812B |------------------*/
-#define WS2812_DI_PIN         8         // Пин DI LED кольца
+#define WS2812_DI_PIN         9         // Пин DI LED кольца
 #define WS2812_LED_NUM        16        // Количество диодов LED кольца
 #define WS2812_BRIGHTNESS     40        // Яркость(общая) LED кольца
 #define COLOR_ORDER           GRB       // Цветовая схема
@@ -52,10 +52,10 @@
 #define QUANTITY_EFFECTS      6         // Количество эффектов
 
 /*------------------------| Пины кнопок и сенсоров |-------------------------*/
-#define LEFT_BUTTON_PIN     9       // Пин кнопки Влево
-#define RIGHT_BUTTON_PIN    10      // Пин кнопки Вправо
-#define SET_BUTTON_PIN      11      // Пин Кнопки Установить
-#define CANCEL_BUTTON_PIN   12      // Пин Кнопки Отмена
+#define LEFT_BUTTON_PIN     10       // Пин кнопки Влево
+#define RIGHT_BUTTON_PIN    11      // Пин кнопки Вправо
+#define SET_BUTTON_PIN      12      // Пин Кнопки Установить
+#define CANCEL_BUTTON_PIN   13      // Пин Кнопки Отмена
 #define SENSOR_MODULE_PIN   7       // Пин сенсорного модуля
 #define ISR_INPUT_PIN       2       // Пин входа прерывания(от RTC)
 #define FR1_PIN             A0      // Пин фото резистора
