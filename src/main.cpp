@@ -113,7 +113,7 @@ void loop() {
     static bool buttonsVolumeFlag = false;
       if (set_btn.press()) {
         if (!mp3FlagPlayer) {
-          mp3Player.play(songNumber);
+          mp3Player.play(SONG_NUMBER);
           mp3FlagPlayer = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
           displayTM1637.point(false);
@@ -353,7 +353,7 @@ void loop() {
       /* Allocate memmory for timer variable */
       uint32_t* _tmr = new uint32_t(millis());
 
-      mp3Player.play(songNumber);
+      mp3Player.play(SONG_NUMBER);
 
       while (true) {
         func[effectNumber]();
