@@ -1,30 +1,40 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#define RTC_DS3231
+//#define RTC_DS1307
+
 /*------------------------| Настройки будильника |---------------------------*/
 #define DOTS_TIMER          500     // Период мигания точек в миллисекундах
 #define NUMBERS_TIMER       1000    // Период обновления цифр часов - 1 секунда
 #define EFFECT_SHOW_TIMER   5000    // Время демонстрации эффектов LED кольца 5 сек.
 #define WS_ALGORITHM_SPEED  10      // Задержа в алгоритме эффектов 10 миллисек.
 #define alarmTimeOut        5       // Длительность сигнализации будильника в мин.
-#define SONG_NUMBER          1       // Номер трека на SD-карте
+#define SONG_NUMBER         1       // Номер трека на SD-карте
 
 /*------------------------| Настройки RTC DS3231 |---------------------------*/
-#define RTC_I2C_ADDR        0x68    // Адрес RTC на шаине I2C
-#define ALARM_1_REGISTER    0x07    // Регистр будильника 1
-#define ALARM_2_REGISTER    0x0B    // Регистр будильника 2
-#define CONTROL_REGISTER    0x0E    // Регистр котроля DS3231
-#define STATUS_REGISTER     0x0F    // Регистр статуса DS3231
+#ifdef RTC_DS3231
+  #define RTC_I2C_ADDR        0x68    // Адрес RTC на шаине I2C
+  #define ALARM_1_REGISTER    0x07    // Регистр будильника 1
+  #define ALARM_2_REGISTER    0x0B    // Регистр будильника 2
+  #define CONTROL_REGISTER    0x0E    // Регистр котроля DS3231
+  #define STATUS_REGISTER     0x0F    // Регистр статуса DS3231
 
-/* Биты регистра контроля RTC DS3231 */
-#define A1IE_BIT      0     // Вкл прерывание будильником 1
-#define A2IE_BIT      1     // Вкл прерывание будильником 2
-#define INTCN_BIT     2     // INTerrupt CoNtrol. 0 - SQW(by Meandr), 1 -INT(by Alarm)
-#define RS1_BIT       3     // RS1 и  RS2биты отвечающие за частоту меандра
-#define RS2_BIT       4     // RS1 = 0 and RS2 = 0 , SQW -> 1kHz
-/* Биты статусного регистра RTC DS3231 */
-#define A1F_BIT       0     // Флаг прерывания будильника 1
-#define A2F_BIT       1     // Флаг прерывания будильника 2
+  /* Биты регистра контроля RTC DS3231 */
+  #define A1IE_BIT      0     // Вкл прерывание будильником 1
+  #define A2IE_BIT      1     // Вкл прерывание будильником 2
+  #define INTCN_BIT     2     // INTerrupt CoNtrol. 0 - SQW(by Meandr), 1 -INT(by Alarm)
+  #define RS1_BIT       3     // RS1 и  RS2биты отвечающие за частоту меандра
+  #define RS2_BIT       4     // RS1 = 0 and RS2 = 0 , SQW -> 1kHz
+  /* Биты статусного регистра RTC DS3231 */
+  #define A1F_BIT       0     // Флаг прерывания будильника 1
+  #define A2F_BIT       1     // Флаг прерывания будильника 2
+#endif /* RTC_DS3231 */
+
+/*------------------------| Настройки RTC DS1307 |---------------------------*/
+#ifdef RTC_DS1307
+
+#endif /* RTC_DS1307 */
 
 /*-------------------| Адреса значений в EEPROM памяти |---------------------*/
 #define TM1637_BRIGHTNESS_ADDR       0x00   // Адрес в EEPROM значения яркости
@@ -53,7 +63,7 @@
 #define QUANTITY_EFFECTS      6         // Количество эффектов
 
 /*------------------------| Пины кнопок и сенсоров |-------------------------*/
-#define LEFT_BUTTON_PIN     10       // Пин кнопки Влево
+#define LEFT_BUTTON_PIN     10      // Пин кнопки Влево
 #define RIGHT_BUTTON_PIN    11      // Пин кнопки Вправо
 #define SET_BUTTON_PIN      12      // Пин Кнопки Установить
 #define CANCEL_BUTTON_PIN   13      // Пин Кнопки Отмена
