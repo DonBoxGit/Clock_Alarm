@@ -111,51 +111,51 @@ void loop() {
     case Mode::WORK:
     static bool mp3FlagPlayer = false;
     static bool buttonsVolumeFlag = false;
-      if (set_btn.press()) {
-        if (!mp3FlagPlayer) {
-          mp3Player.play(SONG_NUMBER);
-          mp3FlagPlayer = true;
-          displayTM1637.displayByte(_empty, _empty, _empty, _empty);
-          displayTM1637.point(false);
-          displayTM1637.display(0, mp3Volume / 10);
-          displayTM1637.display(1, mp3Volume % 10);
-        } else {
-          mp3Player.stop();
-          mp3FlagPlayer = false;
-          EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
-          eeprom_busy_wait();
-          _delay_ms(10);
-          displayTime();
-        }
-      }
-
-      if (sensor_btn.press() && !ledRingflag && !mp3FlagPlayer) {
-        ringEffectShowTimer.resetCounter();
-        ledRingflag = true;
-      }
-
-      if (ledRingflag) {
-        while (!ringEffectShowTimer.ready()) {
-          func[effectNumber]();
-
-          /* Show time while LED Ring works */
-          if (checkTime.ready()) displayTime();
-          displayTM1637.point(blinkPointsTimer.getStatus());
-
-          /* Tracing the sensor button click */
-          set_btn.tick();
-          if (sensor_btn.press()) {
-            if (++effectNumber > (QUANTITY_EFFECTS - 1)) effectNumber = 0;
-            ringEffectShowTimer.resetCounter();
-          }
-        }
-        
-        FastLED.clear();
-        FastLED.show();
-        ledRingflag = false;
-        EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNumber);
+    if (set_btn.press()) {
+      if (!mp3FlagPlayer) {
+        mp3Player.play(SONG_NUMBER);
+        mp3FlagPlayer = true;
+        displayTM1637.displayByte(_empty, _empty, _empty, _empty);
+        displayTM1637.point(false);
+        displayTM1637.display(0, mp3Volume / 10);
+        displayTM1637.display(1, mp3Volume % 10);
+      } else {
+        mp3Player.stop();
+        mp3FlagPlayer = false;
+        EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
         eeprom_busy_wait();
         _delay_ms(10);
+        displayTime();
+      }
+    }
+
+    if (sensor_btn.press() && !ledRingflag && !mp3FlagPlayer) {
+      ringEffectShowTimer.resetCounter();
+      ledRingflag = true;
+    }
+
+    if (ledRingflag) {
+      while (!ringEffectShowTimer.ready()) {
+        func[effectNumber]();
+
+        /* Show time while LED Ring works */
+        if (checkTime.ready()) displayTime();
+        displayTM1637.point(blinkPointsTimer.getStatus());
+
+        /* Tracing the sensor button click */
+        set_btn.tick();
+        if (sensor_btn.press()) {
+          if (++effectNumber > (QUANTITY_EFFECTS - 1)) effectNumber = 0;
+          ringEffectShowTimer.resetCounter();
+        }
+      }
+        
+      FastLED.clear();
+      FastLED.show();
+      ledRingflag = false;
+      EEPROM.put(WS_EFFECT_NUMBER_ADDR, effectNumber);
+      eeprom_busy_wait();
+      _delay_ms(10);
       }
 
       if (!mp3FlagPlayer) {

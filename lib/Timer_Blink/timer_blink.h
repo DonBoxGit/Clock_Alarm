@@ -6,24 +6,24 @@
 /*-----------------------------| Class Timer |-------------------------------*/
 class Timer {
   public:
-    Timer(uint16_t period = 1000);
+    Timer(uint32_t period = 1000);
     ~Timer();
     
     bool ready(void);
     void resetCounter(void);
-    void setPeriod (uint16_t period);
-    uint16_t getPeriod(void);
+    void setPeriod (uint32_t period);
+    uint32_t getPeriod(void);
     uint32_t getTmr(void);
 
   private:
     uint32_t _tmr = millis();
-    uint16_t _period;
+    uint32_t _period;
 };
 
 /*------------------------------| Class Blink |------------------------------*/
 class Blink : public Timer {
   public:
-    Blink(uint16_t period = 500);
+    Blink(uint32_t period = 500);
     ~Blink();
 
     bool getStatus  (void);
