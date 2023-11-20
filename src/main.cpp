@@ -15,17 +15,6 @@
 
 #include "main.h"
 
-/* Initialization of buttons for control */
-EncButton<EB_TICK, LEFT_BUTTON_PIN>   left_btn   (INPUT_PULLUP);
-EncButton<EB_TICK, RIGHT_BUTTON_PIN>  right_btn  (INPUT_PULLUP);
-EncButton<EB_TICK, SET_BUTTON_PIN>    set_btn    (INPUT_PULLUP);
-EncButton<EB_TICK, CANCEL_BUTTON_PIN> cancel_btn (INPUT_PULLUP);
-SensorButton sensor_btn(SENSOR_MODULE_PIN);
-
-/* Create softSerial and mp3player objects */
-SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
-DFRobotDFPlayerMini mp3Player;
-
 void setup() {
   Serial.begin(9600);
   Serial.setTimeout(60000);
@@ -53,15 +42,15 @@ void setup() {
   FastLED.clear();
   FastLED.show();
 
+#ifdef RTC_DS3231
   uint8_t value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   if (value != 0x00) value = 0x00;
 
   /* Allow interrupt to INT/SQW by Alarm 1 */
   value |= (1 << A1IE_BIT) | (1 << INTCN_BIT);
   writeRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER, value);
-
-  // value = readRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER);
   alarm1 = getAlarm1();
+#endif /* RTC_DS3231 */
 
   /* Allowing an external interrupt on the SQW signal */
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
@@ -71,11 +60,11 @@ void setup() {
   if (!mp3Player.begin(softSerial)) {
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::DFPLAYER_SERIAL_ERROR;
-  } else if (!pDS3231->begin()) {
+  } else if (!pRTC->begin()) {
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::RTC_I2C_NOT_RESPONSE;
   } else {
-    dateTime = pDS3231->getTime();
+    dateTime = pRTC->getTime();
     modeStatus = Mode::WORK;
     subMenuState = subMenu::SET_HOURS;
   }
@@ -87,13 +76,13 @@ void setup() {
   mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
 
   /* If the battety too is low level and the power is lost */
-  if (pDS3231->lostPower()) {
-    pDS3231->setTime(COMPILE_TIME);
+  if (pRTC->lostPower()) {
+    pRTC->setTime(COMPILE_TIME);
     modeStatus = Mode::EDIT;
     menuState = Menu::SET_CLOCK;
     subMenuState = subMenu::SET_HOURS;
     displayTM1637.point(true);
-    interim_data = pDS3231->getHours();
+    interim_data = pRTC->getHours();
   }
   
   displayTime();
@@ -259,7 +248,7 @@ void loop() {
             menuState = Menu::SET_CLOCK;
             subMenuState = subMenu::SET_HOURS;
             displayTM1637.point(true);
-            interim_data = pDS3231->getHours();
+            interim_data = pRTC->getHours();
           }
 
           if (interim_data == 2) {
@@ -279,15 +268,15 @@ void loop() {
                    subMenuState == subMenu::SET_HOURS) {
           dateTime.hour = interim_data;   // Transmit data to struct.hour
           /* Update the  minutes so that they don't get lost */ 
-          dateTime.minute = pDS3231->getMinutes(); 
-          pDS3231->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          dateTime.minute = pRTC->getMinutes(); 
+          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
-          interim_data = pDS3231->getMinutes(); // Updating interim for next editing
+          interim_data = pRTC->getMinutes(); // Updating interim for next editing
         } else if (menuState == Menu::SET_CLOCK && 
                    subMenuState == subMenu::SET_MINUTES) {
           dateTime.minute = interim_data; // Put into DateTime struct a minute
           dateTime.second = 0;            // Seconds don't need to setup
-          pDS3231->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;               // Reset intermediate data

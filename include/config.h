@@ -1,6 +1,9 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#define DEBUG_ALARM_CLOCK
+
+/* Раскомментировать нужное */
 #define RTC_DS3231
 //#define RTC_DS1307
 
@@ -31,15 +34,16 @@
   #define A2F_BIT       1     // Флаг прерывания будильника 2
 #endif /* RTC_DS3231 */
 
-/*------------------------| Настройки RTC DS1307 |---------------------------*/
-#ifdef RTC_DS1307
-
-#endif /* RTC_DS1307 */
-
 /*-------------------| Адреса значений в EEPROM памяти |---------------------*/
 #define TM1637_BRIGHTNESS_ADDR       0x00   // Адрес в EEPROM значения яркости
 #define DFPLAYER_VOLUME_VALUE_ADDR   0x01   // Адрес в EEPROM значения громкости
 #define WS_EFFECT_NUMBER_ADDR        0x02   // Адрес в EEPROM номера эффекта LED ring
+#ifdef RTC_DS1307
+  #define RTC_ALARM_SECONDS          0x03   // Адрес в EEPROM - секунды будильника
+  #define RTC_ALARM_MINUTES          0x04   // Адрес в EEPROM - минуты будильника
+  #define RTC_ALARM_HOURS            0x05   // Адрес в EEPROM - часы будильника
+  #define RTC_ALARM_DAY              0x06   // Адрес в EEPROM - день будильника
+#endif /* RTC_DS1307 */
 
 /*--------------------------| Настройки DFPlayer |---------------------------*/
 #define DFPLAYER_RX_PIN         3   // RX пин плеера

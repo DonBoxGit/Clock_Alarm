@@ -9,11 +9,11 @@ uint32_t Now, clocktimer;
 boolean flag;
 
 void displayTime(void) {
-  if (!getTimeDS3231()[0]) displayTM1637.displayByte(0, _empty);
-  else displayTM1637.display(0, getTimeDS3231()[0]);
-  displayTM1637.display(1, getTimeDS3231()[1]);
-  displayTM1637.display(2, getTimeDS3231()[2]);
-  displayTM1637.display(3, getTimeDS3231()[3]);
+  if (!getTimeRTC()[0]) displayTM1637.displayByte(0, _empty);
+  else displayTM1637.display(0, getTimeRTC()[0]);
+  displayTM1637.display(1, getTimeRTC()[1]);
+  displayTM1637.display(2, getTimeRTC()[2]);
+  displayTM1637.display(3, getTimeRTC()[3]);
 }
 
 bool checkLedBrightness(int8_t &brightness) {

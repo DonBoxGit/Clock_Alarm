@@ -49,13 +49,13 @@ void menuPrint(int8_t value) {
             displayTM1637.displayByte(0, _empty);
             displayTM1637.displayByte(1, _empty);
           }
-          displayTM1637.display(2, getTimeDS3231()[2]);
-          displayTM1637.display(3, getTimeDS3231()[3]);
+          displayTM1637.display(2, getTimeRTC()[2]);
+          displayTM1637.display(3, getTimeRTC()[3]);
           break;
 
         case subMenu::SET_MINUTES:
-          displayTM1637.display(0,getTimeDS3231()[0]);
-          displayTM1637.display(1, getTimeDS3231()[1]);
+          displayTM1637.display(0,getTimeRTC()[0]);
+          displayTM1637.display(1, getTimeRTC()[1]);
           if (blinkPointsTimer.getStatus()) {
             displayTM1637.display(2, value / 10);
             displayTM1637.display(3, value % 10);

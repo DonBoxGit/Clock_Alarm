@@ -2,21 +2,36 @@
 #define _MAIN_H_
 
 #include <Wire.h>
+#include <EEPROM.h>
+#include <SoftwareSerial.h>
 #include <EncButton.h>
 #include <DFRobotDFPlayerMini.h>
-#include <SoftwareSerial.h>
-#include <EEPROM.h>
+
 #include "alarmTime.h"
 #include "sensorButton.h"
 #include "menuTree.h"
 #include "ws2812Effects.h"
+
+/* Initialization of buttons for control */
+EncButton<EB_TICK, LEFT_BUTTON_PIN>   left_btn   (INPUT_PULLUP);
+EncButton<EB_TICK, RIGHT_BUTTON_PIN>  right_btn  (INPUT_PULLUP);
+EncButton<EB_TICK, SET_BUTTON_PIN>    set_btn    (INPUT_PULLUP);
+EncButton<EB_TICK, CANCEL_BUTTON_PIN> cancel_btn (INPUT_PULLUP);
+SensorButton sensor_btn(SENSOR_MODULE_PIN);
+
+/* Create softSerial and mp3player objects */
+SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
+DFRobotDFPlayerMini mp3Player;
 
 Blink blinkPointsTimer(DOTS_TIMER);
 Timer checkTime(NUMBERS_TIMER);
 Timer ringEffectShowTimer(EFFECT_SHOW_TIMER);
 Timer ws2812Timer(WS_ALGORITHM_SPEED);
 
-extern DateTime dateTime;
+#ifdef RTC_DS3231
+  extern DateTime dateTime;
+#endif /* RTC_DS3231 */
+
 RTCAlarmTime alarm1;
 
 /* Static variables for interim data */
