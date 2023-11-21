@@ -1,6 +1,7 @@
 #ifndef _ALARM_TIME_H_
 #define _ALARM_TIME_H_
 
+#include <EEPROM.h>
 #include "config.h"
 
 #ifdef RTC_DS3231
@@ -8,7 +9,7 @@
 #endif /* RTC_DS3231 */
 
 #ifdef RTC_DS1307
-  #include <GyverTM1637.h>
+  #include <DS1307.h>
 #endif /* RTC_DS1307 */
 
 struct RTCAlarmTime {
@@ -19,7 +20,9 @@ struct RTCAlarmTime {
 };
 
 #ifdef RTC_DS1307
-  DS1307 pRTC;
+  extern DS1307* pRTC;
+  extern DateTime dateTime;
+  extern RTCAlarmTime alarm1;
 #endif /* RTC_DS1307 */
 
 #ifdef RTC_DS3231
@@ -45,8 +48,9 @@ First two digits is hours and second two digits is minutes. */
 uint8_t* getTimeRTC(void);
 
 #ifdef RTC_DS1307
-  /* get Alarm function */
-  /* set Alarm function */
+  /* Set and get alarm 1 hours and minutes */
+  void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
+  RTCAlarmTime getAlarm1(void);
 #endif /* RTC_DS1307 */
 
 #endif /* _ALARM_TIME_H_ */

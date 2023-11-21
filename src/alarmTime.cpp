@@ -1,4 +1,17 @@
 #include "alarmTime.h"
+#include <util/delay.h>
+
+uint8_t* getTimeRTC() {
+  static uint8_t timeDisplayArray[4];
+  uint8_t hour, minute;
+  hour = pRTC->getHours();
+  minute = pRTC->getMinutes();
+  timeDisplayArray[0] = hour / 10;
+  timeDisplayArray[1] = hour % 10;
+  timeDisplayArray[2] = minute / 10;
+  timeDisplayArray[3] = minute % 10;
+  return timeDisplayArray;
+}
 
 #ifdef RTC_DS3231
   /* Struct Date and Time */
@@ -90,14 +103,29 @@
   }
 #endif /* RTC_DS3231 */
 
-uint8_t* getTimeRTC() {
-  static uint8_t timeDisplayArray[4];
-  uint8_t hour, minute;
-  hour = pRTC->getHours();
-  minute = pRTC->getMinutes();
-  timeDisplayArray[0] = hour / 10;
-  timeDisplayArray[1] = hour % 10;
-  timeDisplayArray[2] = minute / 10;
-  timeDisplayArray[3] = minute % 10;
-  return timeDisplayArray;
-}
+#ifdef RTC_DS1307
+  DS1307* pRTC = new DS1307;
+  DateTime dateTime;
+  RTCAlarmTime alarm1;
+
+  void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second) {
+    EEPROM.put(RTC_ALARM_SECONDS, second);
+    eeprom_busy_wait();
+    _delay_ms(3);
+    EEPROM.put(RTC_ALARM_MINUTES, minute);
+    eeprom_busy_wait();
+    _delay_ms(3);
+    EEPROM.put(RTC_ALARM_HOURS, hour);
+    eeprom_busy_wait();
+    _delay_ms(3);
+  }
+
+  RTCAlarmTime getAlarm1() {
+    RTCAlarmTime alarmData;
+    EEPROM.get(RTC_ALARM_SECONDS, alarmData.second);
+    EEPROM.get(RTC_ALARM_MINUTES, alarmData.minute);
+    EEPROM.get(RTC_ALARM_HOURS, alarmData.hour);
+    return alarmData;
+  }
+
+#endif /* RTC_DS1307 */
