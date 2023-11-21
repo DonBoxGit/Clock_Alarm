@@ -2,6 +2,7 @@
 #define _MAIN_H_
 
 #include <Wire.h>
+#include <EEPROM.h>
 #include <SoftwareSerial.h>
 #include <EncButton.h>
 #include <DFRobotDFPlayerMini.h>
@@ -27,6 +28,20 @@ Timer checkTime(NUMBERS_TIMER);
 Timer ringEffectShowTimer(EFFECT_SHOW_TIMER);
 Timer ws2812Timer(WS_ALGORITHM_SPEED);
 
+/* Working modes of Alarm clock device */
+enum class Mode : uint8_t {
+  WORK = 0,
+  EDIT,
+  ALARM,
+  ERROR
+} modeStatus;
+
+/* Enumeration of errors */
+enum class AlarmClockErrors : uint8_t {
+  RTC_I2C_NOT_RESPONSE = 0,
+  DFPLAYER_SERIAL_ERROR
+} alarmClockError;
+
 #ifdef RTC_DS3231
   extern DateTime dateTime;
 
@@ -42,19 +57,5 @@ static int8_t interim_data = 0;
 static bool ledRingflag = false;
 static int8_t mp3Volume;
 static uint8_t effectNumber;
-
-/* Working modes of Alarm clock device */
-enum class Mode : uint8_t {
-  WORK = 0,
-  EDIT,
-  ALARM,
-  ERROR
-} modeStatus;
-
-/* Enumeration of errors */
-enum class AlarmClockErrors : uint8_t {
-  RTC_I2C_NOT_RESPONSE = 0,
-  DFPLAYER_SERIAL_ERROR
-} alarmClockError;
 
 #endif /* _MAIN_H_*/

@@ -1,7 +1,6 @@
 #ifndef _ALARM_TIME_H_
 #define _ALARM_TIME_H_
 
-#include <EEPROM.h>
 #include "config.h"
 
 #ifdef RTC_DS3231
@@ -26,6 +25,9 @@ struct RTCAlarmTime {
 #endif /* RTC_DS1307 */
 
 #ifdef RTC_DS3231
+  /* Struct Date and Time */
+  extern DateTime dateTime;
+  extern RTCAlarmTime alarm1;
   /* ponter's declaration of MicroDS3231 object */
   extern MicroDS3231* pRTC;
 
@@ -40,7 +42,7 @@ struct RTCAlarmTime {
   
   /* Set and get alarm 1 hours and minutes */
   void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
-  RTCAlarmTime getAlarm1(void);
+  RTCAlarmTime getAlarm_1(void);
 #endif /* RTC_DS3231 */
 
 /* Return the pointer Array uint8_t data of time.

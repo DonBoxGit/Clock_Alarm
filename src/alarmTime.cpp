@@ -14,9 +14,8 @@ uint8_t* getTimeRTC() {
 }
 
 #ifdef RTC_DS3231
-  /* Struct Date and Time */
+  RTCAlarmTime alarm1;
   DateTime dateTime;
-
   MicroDS3231 *pRTC = new MicroDS3231(RTC_I2C_ADDR);
 
   uint8_t bcd2dec(uint8_t bcd) { return ((bcd / 16) * 10) + (bcd % 16); }
@@ -72,7 +71,7 @@ uint8_t* getTimeRTC() {
     writeRegisterDS3231(RTC_I2C_ADDR, STATUS_REGISTER, value);
   }
 
-  RTCAlarmTime getAlarm1() {
+  RTCAlarmTime getAlarm_1() {
     uint8_t values[4];
     RTCAlarmTime alarmData;
 

@@ -55,7 +55,7 @@ void setup() {
   /* Allow interrupt to INT/SQW by Alarm 1 */
   value |= (1 << A1IE_BIT) | (1 << INTCN_BIT);
   writeRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER, value);
-  alarm1 = getAlarm1();
+  alarm1 = getAlarm_1();
 
   /* Allowing an external interrupt on the SQW signal */
   pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
@@ -83,7 +83,9 @@ void setup() {
     alarmClockError = AlarmClockErrors::RTC_I2C_NOT_RESPONSE;
   } else {
     Serial.println("RTC is OK!");
+#ifdef RTC_DS1307  
     pRTC->start();
+#endif /* RTC_DS1307 */
     dateTime = pRTC->getTime();
     modeStatus = Mode::WORK;
     subMenuState = subMenu::SET_HOURS;
@@ -300,14 +302,14 @@ void loop() {
           dateTime.hour = interim_data;   // Transmit data to struct.hour
           /* Update the  minutes so that they don't get lost */ 
           dateTime.minute = pRTC->getMinutes(); 
-          pRTC->set(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
           interim_data = pRTC->getMinutes(); // Updating interim for next editing
         } else if (menuState == Menu::SET_CLOCK && 
                    subMenuState == subMenu::SET_MINUTES) {
           dateTime.minute = interim_data; // Put into DateTime struct a minute
           dateTime.second = 0;            // Seconds don't need to setup
-          pRTC->set(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;               // Reset intermediate data
