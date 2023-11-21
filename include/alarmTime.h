@@ -53,5 +53,5 @@ struct RTCAlarmTime {
 /* Return the pointer Array uint8_t data of time.
 First two digits is hours and second two digits is minutes. */
 uint8_t* getTimeRTC(void);
-
+void resetMillis(void);
 #endif /* _ALARM_TIME_H_ */

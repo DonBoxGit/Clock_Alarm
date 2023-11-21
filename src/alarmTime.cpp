@@ -1,4 +1,5 @@
 #include <util/delay.h>
+#include <avr/interrupt.h>
 #include "alarmTime.h"
 
 uint8_t* getTimeRTC() {
@@ -11,6 +12,16 @@ uint8_t* getTimeRTC() {
   timeDisplayArray[2] = minute / 10;
   timeDisplayArray[3] = minute % 10;
   return timeDisplayArray;
+}
+
+/* Reset the millis counter */
+void resetMillis(){
+  extern volatile unsigned long timer0_millis;
+  extern volatile unsigned long  timer0_overflow_count;
+  cli();
+  timer0_millis = 0;
+  timer0_overflow_count = 0;
+  sei();
 }
 
 #ifdef RTC_DS3231
