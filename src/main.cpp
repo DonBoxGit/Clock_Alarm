@@ -16,9 +16,12 @@
 #include "main.h"
 
 void setup() {
+#ifdef DEBUG_ALARM_CLOCK
   Serial.begin(9600);
-  Serial.setTimeout(60000);
+#endif /* DEBUG_ALARM_CLOCK */
+#ifdef DF_MP3_PLAYER
   softSerial.begin(9600);
+#endif /* DF_MP3_PLAYER */
 
   /* Read the data from EEPROM memory */
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
@@ -65,7 +68,9 @@ void setup() {
 #ifdef DF_MP3_PLAYER
   /* Checking the equipment for the response */
   if (!mp3Player.begin(softSerial)) {
+#ifdef DEBUG_ALARM_CLOCK
     Serial.println("MP3player Error.");
+#endif /* DEBUG_ALARM_CLOCK */
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::DFPLAYER_SERIAL_ERROR;
   } else {
@@ -78,11 +83,15 @@ void setup() {
 #endif /* DF_MP3_PLAYER */
 
   if (!pRTC->begin()) {
+#ifdef DEBUG_ALARM_CLOCK
     Serial.println("RTC error.");
+#endif /* DEBUG_ALARM_CLOCK */
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::RTC_I2C_NOT_RESPONSE;
   } else {
+#ifdef DEBUG_ALARM_CLOCK
     Serial.println("RTC is OK!");
+#endif /* DEBUG_ALARM_CLOCK */
 #ifdef RTC_DS1307  
     pRTC->start();
 #endif /* RTC_DS1307 */
@@ -93,7 +102,9 @@ void setup() {
 
   /* If the battety too is low level and the power is lost */
   if (pRTC->lostPower()) {
+#ifdef DEBUG_ALARM_CLOCK
     Serial.println("RTC is LOW battary.");
+#endif /* DEBUG_ALARM_CLOCK */
 #ifdef RTC_DS3231    
     pRTC->setTime(COMPILE_TIME);
 #endif /* RTC_DS3231 */

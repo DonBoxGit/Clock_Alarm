@@ -20,8 +20,10 @@ EncButton<EB_TICK, CANCEL_BUTTON_PIN> cancel_btn (INPUT_PULLUP);
 SensorButton sensor_btn(SENSOR_MODULE_PIN);
 
 /* Create softSerial and mp3player objects */
-SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
-DFRobotDFPlayerMini mp3Player;
+#ifdef DF_MP3_PLAYER
+  SoftwareSerial softSerial(DFPLAYER_RX_PIN, DFPLAYER_TX_PIN);
+  DFRobotDFPlayerMini mp3Player;
+#endif /* DF_MP3_PLAYER */
 
 Blink blinkPointsTimer(DOTS_TIMER);
 Timer checkTime(NUMBERS_TIMER);
