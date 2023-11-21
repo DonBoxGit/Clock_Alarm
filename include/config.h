@@ -71,7 +71,9 @@
 #define SET_BUTTON_PIN      12      // Пин Кнопки Установить
 #define CANCEL_BUTTON_PIN   8       // Пин Кнопки Отмена
 #define SENSOR_MODULE_PIN   7       // Пин сенсорного модуля
-#define ISR_INPUT_PIN       2       // Пин входа прерывания(от RTC)
+#ifdef RTC_DS3231
+  #define ISR_INPUT_PIN     2       // Пин входа прерывания(от RTC)
+#endif /* RTC_DS3231 */
 #define FR1_PIN             A0      // Пин фото резистора
 #define POWER_SENSOR_PIN    A1      // Пин сенсора наличия питания(батарея/БП)
 
