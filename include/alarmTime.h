@@ -50,7 +50,7 @@ uint8_t* getTimeRTC(void);
 #ifdef RTC_DS1307
   /* Set and get alarm 1 hours and minutes */
   void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
-  RTCAlarmTime getAlarm1(void);
+  RTCAlarmTime getAlarm_1(void);
 #endif /* RTC_DS1307 */
 
 #endif /* _ALARM_TIME_H_ */

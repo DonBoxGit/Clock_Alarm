@@ -120,7 +120,7 @@ uint8_t* getTimeRTC() {
     _delay_ms(3);
   }
 
-  RTCAlarmTime getAlarm1() {
+  RTCAlarmTime getAlarm_1() {
     RTCAlarmTime alarmData;
     EEPROM.get(RTC_ALARM_SECONDS, alarmData.second);
     EEPROM.get(RTC_ALARM_MINUTES, alarmData.minute);

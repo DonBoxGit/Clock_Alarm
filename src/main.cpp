@@ -24,18 +24,12 @@ void setup() {
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
   EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNumber);
-  #ifdef RTC_DS1307
-    EEPROM.get(RTC_ALARM_SECONDS, alarm1.second);
-    EEPROM.get(RTC_ALARM_MINUTES, alarm1.minute);
-    EEPROM.get(RTC_ALARM_HOURS, alarm1.hour);
-    EEPROM.get(RTC_ALARM_DAY, alarm1.day);
-  #endif /* RTC_DS1307 */
-  Serial.print("Alarm: ");
-  Serial.print(alarm1.hour);
-  Serial.print(":");
-  Serial.print(alarm1.minute);
-  Serial.print(":");
-  Serial.println(alarm1.second);
+#ifdef RTC_DS1307
+  EEPROM.get(RTC_ALARM_SECONDS, alarm1.second);
+  EEPROM.get(RTC_ALARM_MINUTES, alarm1.minute);
+  EEPROM.get(RTC_ALARM_HOURS, alarm1.hour);
+  EEPROM.get(RTC_ALARM_DAY, alarm1.day);
+#endif /* RTC_DS1307 */
 
   /* Checking data and if they is incorrect then to change */
   if (!checkLedBrightness(ledBrightnessCounter)) {
@@ -64,8 +58,8 @@ void setup() {
   alarm1 = getAlarm1();
 
   /* Allowing an external interrupt on the SQW signal */
-pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
-attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
+  pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
+  attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
 #endif /* RTC_DS3231 */
 
 #ifdef DF_MP3_PLAYER
@@ -291,7 +285,7 @@ void loop() {
           if (interim_data == 2) {
             menuState = Menu::SET_ALLARM;
             subMenuState = subMenu::SET_HOURS;
-            interim_data = getAlarm1().hour;
+            interim_data = getAlarm_1().hour;
           }
 
           if (interim_data == 3) {
@@ -323,7 +317,7 @@ void loop() {
           alarm1.hour = interim_data;
           setAlarm_1(alarm1.hour, alarm1.minute);
           subMenuState = subMenu::SET_MINUTES;
-          interim_data = getAlarm1().minute;
+          interim_data = getAlarm_1().minute;
         } else if (menuState == Menu::SET_ALLARM && subMenuState == subMenu::SET_MINUTES) {
           alarm1.minute = interim_data;
           setAlarm_1(alarm1.hour, alarm1.minute, 0);
@@ -377,7 +371,7 @@ void loop() {
       sei();
 
       /* Allocate memmory for timer variable */
-      uint32_t* _tmr = new uint32_t(millis());
+      uint32_t _tmr = uint32_t(millis());
 #ifdef DF_MP3_PLAYER
       mp3Player.play(SONG_NUMBER);
 #endif /* DF_MP3_PLAYER */
@@ -390,7 +384,7 @@ void loop() {
 
         /* Tracing the sensor button click */
         if (sensor_btn.press() ||
-            (millis() - *_tmr) > (1000UL * 60UL * (uint32_t)alarmTimeOut)) {
+            (millis() - _tmr) > (1000UL * 60UL * (uint32_t)ALARM_TIME_OUT)) {
           modeStatus = Mode::WORK;
 #ifdef DF_MP3_PLAYER
           mp3Player.stop();
@@ -399,7 +393,6 @@ void loop() {
         }
       }
 
-      delete _tmr;
       FastLED.clear();
       FastLED.show();
       }
@@ -424,7 +417,6 @@ void loop() {
           break;
       }
 
-      Serial.println("Mode ERROR. Press any key...");
       while (true) {
         left_btn.tick();
         right_btn.tick();
