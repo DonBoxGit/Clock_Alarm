@@ -105,13 +105,15 @@ void setup() {
 #ifdef DEBUG_ALARM_CLOCK
     Serial.println("RTC is LOW battary.");
 #endif /* DEBUG_ALARM_CLOCK */
+
 #ifdef RTC_DS3231    
     pRTC->setTime(COMPILE_TIME);
 #endif /* RTC_DS3231 */
 
 #ifdef RTC_DS1307
-  pRTC->setCompTime();
+    pRTC->setCompTime();
 #endif /* RTC_DS1307 */
+
     modeStatus = Mode::EDIT;
     menuState = Menu::SET_CLOCK;
     subMenuState = subMenu::SET_HOURS;
@@ -243,12 +245,15 @@ void loop() {
         }
       }
 
+#ifdef RTC_DS1307
       /* Check the alarm time */
       if (alarm1.hour == pRTC->getHours() &&
           alarm1.minute == pRTC->getMinutes() &&
           alarm1.second == pRTC->getSeconds()) {
             modeStatus = Mode::ALARM;
+            resetMillis();
       }
+#endif /* RTC_DS1307 */
 
       break; /* End of case WORK */
     
@@ -380,36 +385,48 @@ void loop() {
     
 /*------------------------------| Mode ALARM |-------------------------------*/
     case Mode::ALARM: {
-      displayTime();
+      static uint8_t circle_count = 0;
+      static bool count_flag = true;
+      static uint32_t _tmr = uint32_t(millis());
 
-       /* Reset the millis counter */
-      extern volatile unsigned long timer0_millis;
-      extern volatile unsigned long  timer0_overflow_count;
-      cli();
-      timer0_millis = 0;
-      timer0_overflow_count = 0;
-      sei();
+      if (sensor_btn.press() && !count_flag) modeStatus = Mode::WORK;
 
-      /* Allocate memmory for timer variable */
-      uint32_t _tmr = uint32_t(millis());
+      if (checkTime.ready()) displayTime();
+      displayTM1637.point(blinkPointsTimer.getStatus());
+
+      if (!count_flag &&
+          (millis() - _tmr) > (60000UL * (uint32_t)PAUSE_BETWEEN_ALARM)) {
+        count_flag = true;
+        _tmr = millis();
+      }
+
+      if (count_flag) {
 #ifdef DF_MP3_PLAYER
-      mp3Player.play(SONG_NUMBER);
+        mp3Player.play(SONG_NUMBER);
 #endif /* DF_MP3_PLAYER */
-      while (true) {
-        func[effectNumber]();
+        while (true) {
+          func[effectNumber]();
 
-        /* Show time while LED Ring works */
-        if (checkTime.ready()) displayTime();
-        displayTM1637.point(blinkPointsTimer.getStatus());
+          /* Show time while LED Ring works */
+          if (checkTime.ready()) displayTime();
+          displayTM1637.point(blinkPointsTimer.getStatus());
 
-        /* Tracing the sensor button click */
-        if (sensor_btn.press() ||
-            (millis() - _tmr) > (1000UL * 60UL * (uint32_t)ALARM_TIME_OUT)) {
-          modeStatus = Mode::WORK;
+          /* Tracing the sensor button click */
+          if ((millis() - _tmr) > (60000UL * (uint32_t)ALARM_TIME_OUT)) {
+            _tmr = millis();
+            ++circle_count;
+            count_flag = false;
 #ifdef DF_MP3_PLAYER
-          mp3Player.stop();
+            mp3Player.stop();
 #endif /* DF_MP3_PLAYER */
-          break;
+            break;
+          }
+          
+          if (sensor_btn.press() || circle_count == COUNT_OF_REPEAT) {
+            modeStatus = Mode::WORK;
+            circle_count = 0;
+            break;
+          }
         }
       }
 

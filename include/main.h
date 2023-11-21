@@ -48,7 +48,7 @@ enum class AlarmClockErrors : uint8_t {
   extern DateTime dateTime;
 
   /* RTC Alarm interrupt function */
-  void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
+  void ISR_RTC_INT() { modeStatus = Mode::ALARM; resetMillis(); }
 #endif /* RTC_DS3231 */
 
 extern RTCAlarmTime alarm1;
