@@ -94,12 +94,6 @@ attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
     modeStatus = Mode::WORK;
     subMenuState = subMenu::SET_HOURS;
   }
-  Serial.print("Time: ");
-  Serial.print(pRTC->getHours());
-  Serial.print(":");
-  Serial.print(pRTC->getMinutes());
-  Serial.print(":");
-  Serial.println(pRTC->getSeconds());
 
   /* If the battety too is low level and the power is lost */
   if (pRTC->lostPower()) {
