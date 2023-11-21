@@ -24,6 +24,18 @@ void setup() {
   EEPROM.get(TM1637_BRIGHTNESS_ADDR, ledBrightnessCounter);
   EEPROM.get(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
   EEPROM.get(WS_EFFECT_NUMBER_ADDR, effectNumber);
+  #ifdef RTC_DS1307
+    EEPROM.get(RTC_ALARM_SECONDS, alarm1.second);
+    EEPROM.get(RTC_ALARM_MINUTES, alarm1.minute);
+    EEPROM.get(RTC_ALARM_HOURS, alarm1.hour);
+    EEPROM.get(RTC_ALARM_DAY, alarm1.day);
+  #endif /* RTC_DS1307 */
+  Serial.print("Alarm: ");
+  Serial.print(alarm1.hour);
+  Serial.print(":");
+  Serial.print(alarm1.minute);
+  Serial.print(":");
+  Serial.println(alarm1.second);
 
   /* Checking data and if they is incorrect then to change */
   if (!checkLedBrightness(ledBrightnessCounter)) {
@@ -35,7 +47,7 @@ void setup() {
   /* Setup TM1637 display */
   displayTM1637.clear();
   displayTM1637.brightness(ledBrightnessCounter);
-
+ 
   /* Setup LED ring settings */
   FastLED.addLeds<WS2812, WS2812_DI_PIN, COLOR_ORDER>(leds, WS2812_LED_NUM);
   FastLED.setBrightness(WS2812_BRIGHTNESS);
@@ -50,41 +62,62 @@ void setup() {
   value |= (1 << A1IE_BIT) | (1 << INTCN_BIT);
   writeRegisterDS3231(RTC_I2C_ADDR, CONTROL_REGISTER, value);
   alarm1 = getAlarm1();
-#endif /* RTC_DS3231 */
 
   /* Allowing an external interrupt on the SQW signal */
-  pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
-  attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
+pinMode(ISR_INPUT_PIN, INPUT_PULLUP); // Input needs to pull up to VCC
+attachInterrupt(0, ISR_RTC_INT, FALLING);  // INT0 attached
+#endif /* RTC_DS3231 */
 
+#ifdef DF_MP3_PLAYER
   /* Checking the equipment for the response */
   if (!mp3Player.begin(softSerial)) {
+    Serial.println("MP3player Error.");
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::DFPLAYER_SERIAL_ERROR;
-  } else if (!pRTC->begin()) {
+  } else {
+    /* Constrain and set volume of mp3 player */
+    mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
+    mp3Player.volume(mp3Volume);
+    mp3Player.EQ(DFPLAYER_EQ_NORMAL);
+    mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
+  }
+#endif /* DF_MP3_PLAYER */
+
+  if (!pRTC->begin()) {
+    Serial.println("RTC error.");
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::RTC_I2C_NOT_RESPONSE;
   } else {
+    Serial.println("RTC is OK!");
+    pRTC->start();
     dateTime = pRTC->getTime();
     modeStatus = Mode::WORK;
     subMenuState = subMenu::SET_HOURS;
   }
-
-  /* Constrain and set volume of mp3 player */
-  mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
-  mp3Player.volume(mp3Volume);
-  mp3Player.EQ(DFPLAYER_EQ_NORMAL);
-  mp3Player.outputDevice(DFPLAYER_DEVICE_SD);
+  Serial.print("Time: ");
+  Serial.print(pRTC->getHours());
+  Serial.print(":");
+  Serial.print(pRTC->getMinutes());
+  Serial.print(":");
+  Serial.println(pRTC->getSeconds());
 
   /* If the battety too is low level and the power is lost */
   if (pRTC->lostPower()) {
+    Serial.println("RTC is LOW battary.");
+#ifdef RTC_DS3231    
     pRTC->setTime(COMPILE_TIME);
+#endif /* RTC_DS3231 */
+
+#ifdef RTC_DS1307
+  pRTC->setCompTime();
+#endif /* RTC_DS1307 */
     modeStatus = Mode::EDIT;
     menuState = Menu::SET_CLOCK;
     subMenuState = subMenu::SET_HOURS;
     displayTM1637.point(true);
     interim_data = pRTC->getHours();
   }
-  
+
   displayTime();
 }
 
@@ -102,14 +135,18 @@ void loop() {
     static bool buttonsVolumeFlag = false;
     if (set_btn.press()) {
       if (!mp3FlagPlayer) {
+#ifdef DF_MP3_PLAYER
         mp3Player.play(SONG_NUMBER);
+#endif /* DF_MP3_PLAYER */
         mp3FlagPlayer = true;
         displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         displayTM1637.point(false);
         displayTM1637.display(0, mp3Volume / 10);
         displayTM1637.display(1, mp3Volume % 10);
       } else {
+#ifdef DF_MP3_PLAYER
         mp3Player.stop();
+#endif /* DF_MP3_PLAYER */
         mp3FlagPlayer = false;
         EEPROM.put(DFPLAYER_VOLUME_VALUE_ADDR, mp3Volume);
         eeprom_busy_wait();
@@ -157,14 +194,18 @@ void loop() {
       } else { /* When the music play */
         if (left_btn.press()) {
           if (--mp3Volume < DFPLAYER_MIN_VOLUME) mp3Volume = DFPLAYER_MIN_VOLUME;
+#ifdef DF_MP3_PLAYER
           mp3Player.volume(mp3Volume);
+#endif /* DF_MP3_PLAYER */
           buttonsVolumeFlag = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
 
         if (right_btn.press()) {
           if (++mp3Volume > DFPLAYER_MAX_VOLUME) mp3Volume = DFPLAYER_MAX_VOLUME;
+#ifdef DF_MP3_PLAYER
           mp3Player.volume(mp3Volume);
+#endif /* DF_MP3_PLAYER */
           buttonsVolumeFlag = true;
           displayTM1637.displayByte(_empty, _empty, _empty, _empty);
         }
@@ -182,7 +223,9 @@ void loop() {
                                   alarm1.minute % 10);
           }
         } else {
+#ifdef DF_MP3_PLAYER
           mp3Player.stop();
+#endif /* DF_MP3_PLAYER */
           mp3FlagPlayer = false;
         }
         displayTime();
@@ -269,14 +312,14 @@ void loop() {
           dateTime.hour = interim_data;   // Transmit data to struct.hour
           /* Update the  minutes so that they don't get lost */ 
           dateTime.minute = pRTC->getMinutes(); 
-          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->set(dateTime);     // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
           interim_data = pRTC->getMinutes(); // Updating interim for next editing
         } else if (menuState == Menu::SET_CLOCK && 
                    subMenuState == subMenu::SET_MINUTES) {
           dateTime.minute = interim_data; // Put into DateTime struct a minute
           dateTime.second = 0;            // Seconds don't need to setup
-          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->set(dateTime);     // Set the DateTime struct in a RTC DS3231
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;               // Reset intermediate data
@@ -341,9 +384,9 @@ void loop() {
 
       /* Allocate memmory for timer variable */
       uint32_t* _tmr = new uint32_t(millis());
-
+#ifdef DF_MP3_PLAYER
       mp3Player.play(SONG_NUMBER);
-
+#endif /* DF_MP3_PLAYER */
       while (true) {
         func[effectNumber]();
 
@@ -355,7 +398,9 @@ void loop() {
         if (sensor_btn.press() ||
             (millis() - *_tmr) > (1000UL * 60UL * (uint32_t)alarmTimeOut)) {
           modeStatus = Mode::WORK;
+#ifdef DF_MP3_PLAYER
           mp3Player.stop();
+#endif /* DF_MP3_PLAYER */
           break;
         }
       }
@@ -385,6 +430,7 @@ void loop() {
           break;
       }
 
+      Serial.println("Mode ERROR. Press any key...");
       while (true) {
         left_btn.tick();
         right_btn.tick();
@@ -398,6 +444,7 @@ void loop() {
           break;
         }
       }
+
       break; /* End of case ERROR */
   }
 }

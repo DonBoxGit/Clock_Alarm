@@ -2,7 +2,6 @@
 #define _MAIN_H_
 
 #include <Wire.h>
-#include <EEPROM.h>
 #include <SoftwareSerial.h>
 #include <EncButton.h>
 #include <DFRobotDFPlayerMini.h>
@@ -30,9 +29,12 @@ Timer ws2812Timer(WS_ALGORITHM_SPEED);
 
 #ifdef RTC_DS3231
   extern DateTime dateTime;
+
+  /* RTC Alarm interrupt function */
+  void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
 #endif /* RTC_DS3231 */
 
-RTCAlarmTime alarm1;
+extern RTCAlarmTime alarm1;
 
 /* Static variables for interim data */
 static int8_t ledBrightnessCounter = 0;
@@ -54,8 +56,5 @@ enum class AlarmClockErrors : uint8_t {
   RTC_I2C_NOT_RESPONSE = 0,
   DFPLAYER_SERIAL_ERROR
 } alarmClockError;
-
-/* RTC Alarm interrupt function */
-void ISR_RTC_INT() { modeStatus = Mode::ALARM; }
 
 #endif /* _MAIN_H_*/
