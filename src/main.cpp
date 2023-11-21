@@ -232,6 +232,13 @@ void loop() {
         }
       }
 
+      /* Check the alarm time */
+      if (alarm1.hour == pRTC->getHours() &&
+          alarm1.minute == pRTC->getMinutes() &&
+          alarm1.second == pRTC->getSeconds()) {
+            modeStatus = Mode::ALARM;
+      }
+
       break; /* End of case WORK */
     
 /*------------------------------| Mode EDIT |--------------------------------*/
@@ -299,17 +306,17 @@ void loop() {
         /* Set Clock */
         } else if (menuState == Menu::SET_CLOCK &&
                    subMenuState == subMenu::SET_HOURS) {
-          dateTime.hour = interim_data;   // Transmit data to struct.hour
+          dateTime.hour = interim_data;      // Transmit data to struct.hour
           /* Update the  minutes so that they don't get lost */ 
           dateTime.minute = pRTC->getMinutes(); 
-          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);           // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
           interim_data = pRTC->getMinutes(); // Updating interim for next editing
         } else if (menuState == Menu::SET_CLOCK && 
                    subMenuState == subMenu::SET_MINUTES) {
           dateTime.minute = interim_data; // Put into DateTime struct a minute
           dateTime.second = 0;            // Seconds don't need to setup
-          pRTC->setTime(dateTime);     // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);        // Set the DateTime struct in a RTC DS3231
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;               // Reset intermediate data

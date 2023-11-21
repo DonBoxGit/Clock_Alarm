@@ -9,6 +9,7 @@
 
 #ifdef RTC_DS1307
   #include <DS1307.h>
+  #include <EEPROM.h>
 #endif /* RTC_DS1307 */
 
 struct RTCAlarmTime {
@@ -22,6 +23,10 @@ struct RTCAlarmTime {
   extern DS1307* pRTC;
   extern DateTime dateTime;
   extern RTCAlarmTime alarm1;
+
+  /* Set and get alarm 1 hours and minutes */
+  void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
+  RTCAlarmTime getAlarm_1(void);
 #endif /* RTC_DS1307 */
 
 #ifdef RTC_DS3231
@@ -48,11 +53,5 @@ struct RTCAlarmTime {
 /* Return the pointer Array uint8_t data of time.
 First two digits is hours and second two digits is minutes. */
 uint8_t* getTimeRTC(void);
-
-#ifdef RTC_DS1307
-  /* Set and get alarm 1 hours and minutes */
-  void setAlarm_1(uint8_t hour, uint8_t minute, uint8_t second = 0);
-  RTCAlarmTime getAlarm_1(void);
-#endif /* RTC_DS1307 */
 
 #endif /* _ALARM_TIME_H_ */

@@ -1,5 +1,5 @@
-#include "alarmTime.h"
 #include <util/delay.h>
+#include "alarmTime.h"
 
 uint8_t* getTimeRTC() {
   static uint8_t timeDisplayArray[4];
