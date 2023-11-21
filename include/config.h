@@ -2,10 +2,9 @@
 #define _CONFIG_H_
 
 #define DEBUG_ALARM_CLOCK
-
-/* Раскомментировать нужное */
-#define RTC_DS3231
-//#define RTC_DS1307
+//define DF_MP3_PLAYER /* Раскомментировать если используется MP3 плеер */
+//#define RTC_DS3231   /* Раскомментировать если используется RTC DS3231 */
+#define RTC_DS1307     /* Раскомментировать если используется RTC DS1307 */
 
 /*------------------------| Настройки будильника |---------------------------*/
 #define DOTS_TIMER          500     // Период мигания точек в миллисекундах
@@ -70,7 +69,7 @@
 #define LEFT_BUTTON_PIN     10      // Пин кнопки Влево
 #define RIGHT_BUTTON_PIN    11      // Пин кнопки Вправо
 #define SET_BUTTON_PIN      12      // Пин Кнопки Установить
-#define CANCEL_BUTTON_PIN   13      // Пин Кнопки Отмена
+#define CANCEL_BUTTON_PIN   8       // Пин Кнопки Отмена
 #define SENSOR_MODULE_PIN   7       // Пин сенсорного модуля
 #define ISR_INPUT_PIN       2       // Пин входа прерывания(от RTC)
 #define FR1_PIN             A0      // Пин фото резистора
