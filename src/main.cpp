@@ -32,6 +32,16 @@ void setup() {
   EEPROM.get(RTC_ALARM_MINUTES, alarm1.minute);
   EEPROM.get(RTC_ALARM_HOURS, alarm1.hour);
   EEPROM.get(RTC_ALARM_DAY, alarm1.day);
+
+  /* Checking alarm clock data and correct */
+  if (alarm1.second > 59) alarm1.second = 0;
+  if (alarm1.minute > 59) alarm1.minute = 0;
+  if (alarm1.hour > 23) alarm1.hour = 0;
+  #ifdef DEBUG_ALARM_CLOCK
+    char strAlarm[15];
+    sprintf(strAlarm, "Alarm: %d:%d:%d", alarm1.hour, alarm1.minute, alarm1.second);
+    Serial.println(strAlarm);
+  #endif /* DEBUG_ALARM_CLOCK */
 #endif /* RTC_DS1307 */
 
   /* Checking data and if they is incorrect then to change */
@@ -40,6 +50,10 @@ void setup() {
     eeprom_busy_wait();
     _delay_ms(10);
   }
+#ifdef DEBUG_ALARM_CLOCK
+  Serial.print("Brightness: ");
+  Serial.println(ledBrightnessCounter);
+#endif /* DEBUG_ALARM_CLOCK */
 
   /* Setup TM1637 display */
   displayTM1637.clear();
@@ -74,6 +88,7 @@ void setup() {
     modeStatus = Mode::ERROR;
     alarmClockError = AlarmClockErrors::DFPLAYER_SERIAL_ERROR;
   } else {
+    Serial.println("MP3player OK.");
     /* Constrain and set volume of mp3 player */
     mp3Volume = constrain(mp3Volume, DFPLAYER_MIN_VOLUME, DFPLAYER_MAX_VOLUME);
     mp3Player.volume(mp3Volume);
@@ -96,6 +111,11 @@ void setup() {
     pRTC->start();
 #endif /* RTC_DS1307 */
     dateTime = pRTC->getTime();
+#ifdef DEBUG_ALARM_CLOCK
+    char strTime[14];
+    sprintf(strTime, "Time: %d:%d:%d", dateTime.hour, dateTime.minute, dateTime.second);
+    Serial.println(strTime);
+#endif /* DEBUG_ALARM_CLOCK */
     modeStatus = Mode::WORK;
     subMenuState = subMenu::SET_HOURS;
   }
@@ -235,7 +255,21 @@ void loop() {
       }
 
       if (!mp3FlagPlayer) {
-        if (checkTime.ready()) displayTime();
+        if (checkTime.ready()) {
+          displayTime();
+          char strTime[8];
+          sprintf(strTime, "%d:%d:%d", dateTime.hour, dateTime.hour, dateTime.second);
+          Serial.println(strTime);
+#ifdef RTC_DS1307
+        /* Check the alarm time */
+          if (alarm1.hour == dateTime.hour &&
+              alarm1.minute == dateTime.hour &&
+              alarm1.second == dateTime.second) {
+            modeStatus = Mode::ALARM;
+            resetMillis();
+          }
+#endif /* RTC_DS1307 */
+        }
         displayTM1637.point(blinkPointsTimer.getStatus());
       } else {
         if (buttonsVolumeFlag) {
@@ -244,16 +278,6 @@ void loop() {
           buttonsVolumeFlag = false;
         }
       }
-
-#ifdef RTC_DS1307
-      /* Check the alarm time */
-      if (alarm1.hour == pRTC->getHours() &&
-          alarm1.minute == pRTC->getMinutes() &&
-          alarm1.second == pRTC->getSeconds()) {
-            modeStatus = Mode::ALARM;
-            resetMillis();
-      }
-#endif /* RTC_DS1307 */
 
       break; /* End of case WORK */
     
