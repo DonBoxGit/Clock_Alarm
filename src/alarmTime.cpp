@@ -4,10 +4,7 @@
 
 uint8_t* getTimeRTC() {
   static uint8_t timeDisplayArray[4];
-  //uint8_t hour, minute;
-  //hour = pRTC->getHours();
-  //minute = pRTC->getMinutes();
-  pRTC->getTime();
+  dateTime = pRTC->getTime();
   timeDisplayArray[0] = dateTime.hour / 10;
   timeDisplayArray[1] = dateTime.hour % 10;
   timeDisplayArray[2] = dateTime.minute / 10;
