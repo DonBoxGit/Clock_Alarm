@@ -352,7 +352,7 @@ void loop() {
         } else if (menuState == Menu::SET_CLOCK &&
                    subMenuState == subMenu::SET_HOURS) {
           dateTime.hour = interim_data;      // Transmit data to struct.hour
-          /* Update the  minutes so that they don't get lost */ 
+          /* Update the minutes so that they don't get lost */ 
           dateTime.minute = pRTC->getMinutes(); 
           pRTC->setTime(dateTime);           // Set the DateTime struct in a RTC DS3231
           subMenuState = subMenu::SET_MINUTES;
