@@ -124,7 +124,7 @@ void setup() {
     subMenuState = subMenu::SET_HOURS;
   }
 
-  /* If the battety too is low level and the power is lost */
+  /* If the battery is too low level and the power is lost */
   if (pRTC->lostPower()) {
 #ifdef DEBUG_ALARM_CLOCK
     Serial.println("RTC is LOW battary.");
