@@ -1,6 +1,6 @@
 /************************************************************************
  *                      Clock Alarm Mp3Player                           *
- *                            ver. 1.0.2                                *
+ *                            ver. 0.2.0                                *
  *    Used RTC DS3231 on I2C wire, 4-Digit LED Display, WS2812B LED     *
  *  Ring 16 leds and DFPlayer Mini.                                     *
  *    Libraries are used EncButton, GyverTM1637 and microDS3231 by      *
@@ -354,14 +354,14 @@ void loop() {
           dateTime.hour = interim_data;      // Transmit data to struct.hour
           /* Update the minutes so that they don't get lost */ 
           dateTime.minute = pRTC->getMinutes(); 
-          pRTC->setTime(dateTime);           // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);           // Set the DateTime struct in a RTC
           subMenuState = subMenu::SET_MINUTES;
           interim_data = pRTC->getMinutes(); // Updating interim for next editing
         } else if (menuState == Menu::SET_CLOCK && 
                    subMenuState == subMenu::SET_MINUTES) {
           dateTime.minute = interim_data; // Put into DateTime struct a minute
           dateTime.second = 0;            // Seconds don't need to setup
-          pRTC->setTime(dateTime);        // Set the DateTime struct in a RTC DS3231
+          pRTC->setTime(dateTime);        // Set the DateTime struct in a RTC
           menuState = Menu::SELECTION_MENU;
           subMenuState = subMenu::SET_HOURS;
           interim_data = 1;               // Reset intermediate data
