@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#define DEBUG_ALARM_CLOCK  /* Отладочная информация в Serial */
+//#define DEBUG_ALARM_CLOCK  /* Вывод отладочной информации в Serial */
 //define DF_MP3_PLAYER       /* Раскомментировать если используется MP3 плеер */
 //#define RTC_DS3231         /* Раскомментировать если используется RTC DS3231 */
 #define RTC_DS1307           /* Раскомментировать если используется RTC DS1307 */

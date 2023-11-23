@@ -1,6 +1,6 @@
 /************************************************************************
  *                      Clock Alarm Mp3Player                           *
- *                            ver. 1.0.0                                *
+ *                            ver. 1.0.2                                *
  *    Used RTC DS3231 on I2C wire, 4-Digit LED Display, WS2812B LED     *
  *  Ring 16 leds and DFPlayer Mini.                                     *
  *    Libraries are used EncButton, GyverTM1637 and microDS3231 by      *
@@ -53,6 +53,10 @@ void setup() {
 #ifdef DEBUG_ALARM_CLOCK
   Serial.print("Brightness: ");
   Serial.println(ledBrightnessCounter);
+  Serial.print("Volume: ");
+  Serial.println(mp3Volume);
+  Serial.print("Number of effect: ");
+  Serial.println(effectNumber);
 #endif /* DEBUG_ALARM_CLOCK */
 
   /* Setup TM1637 display */
@@ -257,13 +261,15 @@ void loop() {
       if (!mp3FlagPlayer) {
         if (checkTime.ready()) {
           displayTime();
+#ifdef DEBUG_ALARM_CLOCK
           char strTime[8];
-          sprintf(strTime, "%d:%d:%d", dateTime.hour, dateTime.hour, dateTime.second);
+          sprintf(strTime, "%d:%d:%d", dateTime.hour, dateTime.minute, dateTime.second);
           Serial.println(strTime);
+#endif /* DEBUG_ALARM_CLOCK */
 #ifdef RTC_DS1307
         /* Check the alarm time */
           if (alarm1.hour == dateTime.hour &&
-              alarm1.minute == dateTime.hour &&
+              alarm1.minute == dateTime.minute &&
               alarm1.second == dateTime.second) {
             modeStatus = Mode::ALARM;
             resetMillis();
@@ -278,7 +284,6 @@ void loop() {
           buttonsVolumeFlag = false;
         }
       }
-
       break; /* End of case WORK */
     
 /*------------------------------| Mode EDIT |--------------------------------*/
